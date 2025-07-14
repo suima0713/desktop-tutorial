@@ -1,10 +1,3 @@
-# Welcome to GitHub Desktop!
-
-This is your README. READMEs are where you can communicate what your project is and how to use it.
-
- HEAD
-Write your name on line 6, save it, and then head back to GitHub Desktop.
-Write your name on line 6, save it, and then head back to GitHub Desktop.
 <#
   build.ps1 – Cross‑platform (Win / macOS / Linux) & Fail‑fast
 #>
@@ -35,7 +28,7 @@ function Invoke-Step {
         [Parameter(Mandatory)][scriptblock]$Cmd,
         [Parameter(Mandatory)][string]$Name
     )
-    Write-Host "`n── $Name ──"
+    Write-Output "`n✅ Pipeline finished successfully"
     $global:LASTEXITCODE = 0          # 初期化（多段パイプ対策）
     & $Cmd
     $exit = $LASTEXITCODE
@@ -93,17 +86,18 @@ if ($oversize) { Write-Error "❌ Wheel >10 MB: $($oversize.Name)"; exit 1 }
 # 7) バージョン一致
 # ─────────────────────────────────────────────────────
 Invoke-Step {
-    & $pyExe - <<'PY'
+    # ---------- Python 部分を文字列に ----------
+    $pyScript = @"
 import importlib.metadata as im, pathlib, re, sys
-pkg = "package"      # ←自パッケージ名
+pkg = "desktop_tutorial"
 code_v = im.version(pkg)
 proj_v = re.search(r'version\s*=\s*"([^"]+)"',
                    pathlib.Path("pyproject.toml").read_text())[1]
 if code_v != proj_v:
     sys.exit(f"Version mismatch: {code_v} (code) != {proj_v} (pyproject)")
 print("Version check OK →", code_v)
-PY
-} 'Version consistency'
+"@
 
-Write-Host "`n✅ Pipeline finished successfully"
- 473bd2b (Add build.ps1 and update README)
+    # ---------- Python を実行 ----------
+    $pyScript | & $pyExe -
+} 'Version consistency'
