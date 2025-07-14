@@ -1,0 +1,11 @@
+[project]
+name = "desktop-tutorial"
+version = "0.1.0"
+description = "Sample package"
+authors = [{name = "Suima0713"}]
+requires-python = ">=3.10"
+readme = "README.md"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
