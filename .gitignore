@@ -1,0 +1,13 @@
+# Virtual environment
+.smoke/
+
+# Coverage reports
+.coverage
+coverage.xml
+
+# Build artifacts
+dist/
+*.egg-info/
+
+# IDE / Editor
+.vscode/

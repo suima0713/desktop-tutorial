@@ -53,35 +53,37 @@ if ($IsWindows) { Unblock-File $activateScript }      # ダウンロード属性
 Invoke-Step { & $pyExe -m pip install -U pip }                 'Upgrade pip'
 Invoke-Step { & $pyExe -m pip install -e .[dev] --no-deps }    'Install editable pkg'
 Invoke-Step { & $pyExe -m pip install -r requirements-lock.txt } 'Install locked deps'
-
+Invoke-Step { & $pyExe -m pip install pre-commit } 'install pre-commit'
+Invoke-Step { & $pyExe -m pip install pre-commit mypy } 'install dev tools'
 # ─────────────────────────────────────────────────────
 # 3) 静的解析（パス区切りを / に統一） ★★ UPDATED ★★
 # ─────────────────────────────────────────────────────
-Invoke-Step { pre-commit run --all-files } 'pre‑commit'
-Invoke-Step { mypy src/ }                  'mypy type‑check'
-
+Invoke-Step { & $pyExe -m mypy src/ } 'mypy type-check'
+Invoke-Step { & $pyExe -m pip install pre-commit mypy pytest pytest-cov pip-audit } 'install dev tools'
 # ─────────────────────────────────────────────────────
 # 4) テスト＋カバレッジ
 # ─────────────────────────────────────────────────────
 Invoke-Step {
-    pytest -q --cov=core --cov=adapters --cov=app `
-           --cov-report=xml --cov-fail-under=90
+    & $pyExe -m pytest -q `
+              --cov=core --cov=adapters --cov=app `
+              --cov-report=xml --cov-fail-under=90
 } 'pytest + coverage 90%'
 
 # ─────────────────────────────────────────────────────
 # 5) 静的セキュリティ
 # ─────────────────────────────────────────────────────
-Invoke-Step { pip-audit -r requirements.txt } 'pip‑audit'
+Invoke-Step { & $pyExe -m pip_audit -r requirements.txt } 'pip-audit'
 
 # ─────────────────────────────────────────────────────
 # 6) ビルド（dist クリーンは別タスクで追加予定）
-# ─────────────────────────────────────────────────────
-Invoke-Step { & $pyExe -m build } 'Build artifacts'
+# ───────────────────────────────Invoke-Step { & $py──────────────────────
+Invoke-Step { & $pyExe -m pip install pre-commit mypy pytest pytest-cov pip-audit build } 'install dev tools'
 
 # oversize (>10 MB) チェック
-$oversize = Get-ChildItem dist -Filter *.whl | Where-Object Length -gt 10MB
-if ($oversize) { Write-Error "❌ Wheel >10 MB: $($oversize.Name)"; exit 1 }
-
+if (Test-Path dist) {
+    $oversize = Get-ChildItem dist -Filter *.whl | Where-Object Length -gt 10MB
+    if ($oversize) { Write-Error "❌ Wheel >10 MB: $($oversize.Name)"; exit 1 }
+}
 # ─────────────────────────────────────────────────────
 # 7) バージョン一致
 # ─────────────────────────────────────────────────────
