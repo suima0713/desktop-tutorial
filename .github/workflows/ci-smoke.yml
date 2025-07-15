@@ -15,7 +15,7 @@ jobs:
 
     defaults:
       run:
-        shell: pwsh        # 以降の run は PowerShell
+        shell: pwsh          # 以降の run は PowerShell
 
     steps:
       # 1) ソース取得
@@ -23,7 +23,7 @@ jobs:
 
       # 2) PAT を git clone 認証に注入（bash）
       - name: Inject PAT for private git URLs
-        if: ${{ secrets.GH_PAT != '' }}       # ← ★修正済み
+        if: ${{ secrets.GH_PAT != '' }}      # ★ 同じインデント階層
         shell: bash
         env:
           PAT: ${{ secrets.GH_PAT }}
@@ -44,7 +44,7 @@ jobs:
             **/pyproject.toml
             **/requirements*.txt
 
-      # 4) ビルドバックエンド更新（↑のキャッシュ対象外）
+      # 4) ビルドバックエンド更新（キャッシュ対象外）
       - name: Upgrade pip & setuptools
         run: python -m pip install -U pip setuptools wheel
 
