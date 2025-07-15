@@ -15,20 +15,20 @@ jobs:
 
     defaults:
       run:
-        shell: pwsh          # 以降の run は PowerShell
+        shell: pwsh
 
     steps:
       # 1) ソース取得
       - uses: actions/checkout@v4
 
-      # 2) PAT を git clone 認証に注入（bash）
+      # 2) PAT を git clone 認証に注入
       - name: Inject PAT for private git URLs
-        if: ${{ secrets.GH_PAT != '' }}      # ★ 同じインデント階層
-        shell: bash
         env:
-          PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        if: env.GH_PAT != ''
+        shell: bash
         run: |
-          git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
           git config --global --get-regexp url
 
       - name: Export global gitconfig path
@@ -44,7 +44,7 @@ jobs:
             **/pyproject.toml
             **/requirements*.txt
 
-      # 4) ビルドバックエンド更新（キャッシュ対象外）
+      # 4) ビルドバックエンド更新
       - name: Upgrade pip & setuptools
         run: python -m pip install -U pip setuptools wheel
 
