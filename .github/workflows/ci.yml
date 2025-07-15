@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: echo "GIT_CONFIG_GLOBAL=$HOME/.gitconfig" >> "$GITHUB_ENV"
 
-      # 4) Python セットアップ & pip キャッシュ
+      # 4) Python セットアップ & pip キャッシュ  ←★ 行頭に必ず “-” を付ける
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
