@@ -1,6 +1,9 @@
-- name: Inject PAT for private git URLs
-  env:
-    PAT: ${{ secrets.GH_PAT }}
-  run: |
-    git config --global ('url."https://{0}@github.com/".insteadOf' -f $env:PAT) "https://github.com/"
-    git config --global --get-regexp url
+name: Inject PAT for private git URLs
+shell: bash
+env:
+  PAT: ${{ secrets.GH_PAT }}
+run: |
+　　set -x
+　　git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+　　git config --global --get-regexp url
+　　git ls-remote https://github.com/suima0713/desktop-tutorial.git | head -5 || true
