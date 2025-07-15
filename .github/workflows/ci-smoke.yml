@@ -15,28 +15,30 @@ jobs:
 
     defaults:
       run:
-        shell: pwsh
+        shell: pwsh          # 以降の run は PowerShell
 
     steps:
-      # 1) ソース取得
+      # 1) リポジトリ取得
       - uses: actions/checkout@v4
 
-      # 2) PAT を git clone 認証に注入
+      # 2) PAT 注入 (bash)
       - name: Inject PAT for private git URLs
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        if: env.GH_PAT != ''
+          GH_PAT: ${{ secrets.GH_PAT }}     # secrets → env にコピー
+        if: env.GH_PAT != ''                # ← if では env.* を使う
         shell: bash
         run: |
           git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
           git config --global --get-regexp url
 
+      # 3) グローバル gitconfig 継承
       - name: Export global gitconfig path
         shell: bash
         run: echo "GIT_CONFIG_GLOBAL=$HOME/.gitconfig" >> "$GITHUB_ENV"
 
-      # 3) Python & pip キャッシュ
-      - uses: actions/setup-python@v5
+      # 4) Python セットアップ & pip キャッシュ   ← ★ ここに “-” を追加
+      - name: Set up Python & pip cache
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
@@ -44,10 +46,10 @@ jobs:
             **/pyproject.toml
             **/requirements*.txt
 
-      # 4) ビルドバックエンド更新
+      # 5) ビルドバックエンド更新
       - name: Upgrade pip & setuptools
         run: python -m pip install -U pip setuptools wheel
 
-      # 5) PowerShell ビルドパイプライン
+      # 6) build.ps1 実行
       - name: Run build.ps1
         run: ./build.ps1
