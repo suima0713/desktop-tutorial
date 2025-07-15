@@ -8,13 +8,14 @@ on:
 jobs:
   smoke:
     runs-on: windows-latest
+
     env:
       PYTHONUTF8: "1"
       PYTHONIOENCODING: "utf-8"
 
     defaults:
       run:
-        shell: pwsh
+        shell: pwsh        # 以降の run は PowerShell
 
     steps:
       # 1) ソース取得
@@ -22,12 +23,14 @@ jobs:
 
       # 2) PAT を git clone 認証に注入（bash）
       - name: Inject PAT for private git URLs
+        if: ${{ secrets.GH_PAT != '' }}   # ← PR イベントでも落ちないようガード
         shell: bash
         env:
           PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
           git config --global --get-regexp url
+
       - name: Export global gitconfig path
         shell: bash
         run: echo "GIT_CONFIG_GLOBAL=$HOME/.gitconfig" >> "$GITHUB_ENV"
@@ -36,9 +39,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          # 👇 pip キャッシュを有効化
           cache: pip
-          # 👇 依存関係が変わったときだけ再生成
           cache-dependency-path: |
             **/pyproject.toml
             **/requirements*.txt
