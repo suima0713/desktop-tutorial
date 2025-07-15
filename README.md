@@ -1,3 +1,4 @@
+[![CI](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci.yml)
 # Welcome to GitHub Desktop!
 
 This is your README. READMEs are where you can communicate what your project is and how to use it.
