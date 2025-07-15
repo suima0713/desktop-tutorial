@@ -1,9 +1,6 @@
-name: CI
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: echo "CI pipeline triggered ✅"
+- name: Inject PAT for private git URLs
+  env:
+    PAT: ${{ secrets.GH_PAT }}
+  run: |
+    git config --global ('url."https://{0}@github.com/".insteadOf' -f $env:PAT) "https://github.com/"
+    git config --global --get-regexp url
