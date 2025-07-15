@@ -1,4 +1,4 @@
-name: CI smoke
+name: CI smoke          # ← ファイル重複を避けるなら別名にしてもOK
 
 on:
   push:
@@ -22,12 +22,12 @@ jobs:
 
       # 2) PAT 注入（bash）
       - name: Inject PAT for private git URLs
-        if: ${{ secrets.GH_PAT != '' }}
-        shell: bash
         env:
-          PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.GH_PAT }}   # secrets を env にコピー
+        if: env.GH_PAT != ''              # ← secrets ではなく env で判定
+        shell: bash
         run: |
-          git config --global url."https://${PAT}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
           git config --global --get-regexp url
 
       # 3) 子プロセスへ gitconfig 継承
@@ -35,8 +35,8 @@ jobs:
         shell: bash
         run: echo "GIT_CONFIG_GLOBAL=$HOME/.gitconfig" >> "$GITHUB_ENV"
 
-      # 4) Python セットアップ & pip キャッシュ  ←★ 行頭に必ず “-” を付ける
-      - uses: actions/setup-python@v5
+      # 4) Python セットアップ & pip キャッシュ
+      - uses: actions/setup-python@v5      # ★ 行頭の “-” が必須！
         with:
           python-version: "3.12"
           cache: pip
