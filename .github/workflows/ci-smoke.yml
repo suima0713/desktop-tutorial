@@ -52,7 +52,7 @@ jobs:
     # 5) **Lint / フォーマット統合チェック** -------------------------------
     - name: Run pre-commit (lint & format)
       run: |
-        pre-commit run --show-diff-on-failure --color always --all-files
+        pre-commit run --hook-stage push --show-diff-on-failure --color always --all-files
 
     # 6) ユニットテスト & カバレッジ etc.（既存ステップ） -----------------
     - name: Run build.ps1
