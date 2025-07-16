@@ -28,4 +28,3 @@ cd desktop-tutorial
 
 # 3. テスト
 ./build.ps1 test
-
