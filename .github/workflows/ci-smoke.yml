@@ -40,10 +40,14 @@ jobs:
         key: ${{ runner.os }}-precommit-${{ hashFiles('.pre-commit-config.yaml') }}
 
     # 4) dev 依存（pre-commit, black, ruff…）インストール ------------------
-    - name: Install dev dependencies
+    - name: Install dev dependencies      # ← 先にインストール
       run: |
         python -m pip install -U pip
-        python -m pip install -e '.[dev]'   # pyproject.toml の [project.optional-dependencies].dev
+        python -m pip install -e '.[dev]'
+
+    - name: Run pre-commit (lint & format)  # ← 後で実行
+      run: |
+        pre-commit run --show-diff-on-failure --color always --all-files
 
     # 5) **Lint / フォーマット統合チェック** -------------------------------
     - name: Run pre-commit (lint & format)
