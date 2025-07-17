@@ -1,4 +1,30 @@
 name: CI スモーク
+chore/add-ci-smoke
+on:
+push:
+branches: ['**']
+pull_request:
+
+jobs:
+lint-smoke:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v4
+with:
+fetch-depth: 0
+- uses: actions/setup-python@v5
+with:
+python-version: "3.11"
+- name: Install pre-commit
+run: pip install pre-commit
+- uses: actions/cache@v4
+with:
+path: ~/.cache/pre-commit
+key: ${{ runner.os }}-precommit-${{ hashFiles('.pre-commit-config.yaml') }}
+- name: Smoke lint (diff only)
+run: |
+BASE=$(git merge-base origin/main HEAD)
+pre-commit run --color always --show-diff-on-failure --from-ref $BASE --to-ref HEAD
 
 on:
   push:
