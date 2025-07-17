@@ -9,7 +9,6 @@ readme = "README.md"
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
-chore/phase0-stabilize
 
 [project.optional-dependencies]
 dev = [
@@ -17,4 +16,3 @@ dev = [
   "black==24.4.2",
   "ruff==0.4.4"
 ]
-main
