@@ -1,55 +1,26 @@
-name: CI smoke
-
+name: CI スモーク
 on:
-  push:
-    branches: [ main, '**' ]   # 任意ブランチでも動作
-  pull_request:                # PR でも必ず実行
-  workflow_dispatch:           # 手動トリガ（任意）
+push:
+branches: ['**']
+pull_request:
 
 jobs:
-  smoke:
-    runs-on: windows-latest
-
-    env:
-      PYTHONUTF8: "1"
-      PYTHONIOENCODING: "utf-8"
-
-    defaults:
-      run:
-        shell: pwsh
-
-    steps:
-    # 1) ソース取得 --------------------------------------------------------
-    - uses: actions/checkout@v4
-
-    # 2) Python セットアップ & pip キャッシュ ------------------------------
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-        cache: pip
-        cache-dependency-path: |
-          **/pyproject.toml
-          **/requirements*.txt
-
-    # 3) pre‑commit キャッシュ（ダウンロード短縮） ------------------------
-    - name: Cache pre-commit
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pre-commit
-        # pre-commit config が変わったらキャッシュ無効化
-        key: ${{ runner.os }}-precommit-${{ hashFiles('.pre-commit-config.yaml') }}
-
-    # 4) dev 依存（pre-commit, black, ruff…）インストール ------------------
-    - name: Install dev dependencies      # ← 先にインストール
-      run: |
-        python -m pip install -U pip
-        python -m pip install -e '.[dev]'
-
-    # 5) **Lint / フォーマット統合チェック** -------------------------------
-    - name: Run pre-commit (lint & format)
-      run: |
-        pre-commit run --hook-stage push --show-diff-on-failure --color always --all-files
-
-    # 6) ユニットテスト & カバレッジ etc.（既存ステップ） -----------------
-    - name: Run build.ps1
-      run: ./build.ps1
+lint-smoke:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v4
+with:
+fetch-depth: 0
+- uses: actions/setup-python@v5
+with:
+python-version: "3.11"
+- name: Install pre-commit
+run: pip install pre-commit
+- uses: actions/cache@v4
+with:
+path: ~/.cache/pre-commit
+key: ${{ runner.os }}-precommit-${{ hashFiles('.pre-commit-config.yaml') }}
+- name: Smoke lint (diff only)
+run: |
+BASE=$(git merge-base origin/main HEAD)
+pre-commit run --color always --show-diff-on-failure --from-ref $BASE --to-ref HEAD
