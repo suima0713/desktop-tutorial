@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"                # requirements*.txt がある場所
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps(pip)"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"                # .github/workflows
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps(actions)"
