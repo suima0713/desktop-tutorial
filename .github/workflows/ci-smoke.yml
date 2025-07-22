@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   lint-smoke:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,3 +33,12 @@ jobs:
           BASE="$(git merge-base origin/main HEAD)"
           pre-commit run --color always --show-diff-on-failure \
             --from-ref "$BASE" --to-ref HEAD
+
+      - name: Fetch main for diff
+        run: git fetch --no-tags --depth=1 origin main
+
+      - name: Smoke lint (diff only)
+        run: |
+          BASE=$(git merge-base origin/main HEAD)
+          pre-commit run --color always --show-diff-on-failure \
+          --from-ref "$BASE" --to-ref HEAD
