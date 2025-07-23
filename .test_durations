@@ -1,4 +1,4 @@
 {
-    "tests/test_math_utils.py::test_add": 0.0007656000088900328,
-    "tests/test_smoke.py::test_placeholder": 0.0005642001051455736
+    "tests/test_math_utils.py::test_add": 0.000550700118765235,
+    "tests/test_smoke.py::test_placeholder": 0.00047190021723508835
 }
