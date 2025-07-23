@@ -21,7 +21,7 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements-dev.txt
       - run: pytest --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -36,7 +36,7 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
       - run: pip install coverage
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
       - run: |
           coverage combine coverage*/.coverage*
           coverage report --fail-under=80
