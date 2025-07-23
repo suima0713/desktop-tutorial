@@ -65,6 +65,11 @@ jobs:
         with:
           pattern: coverage-*
 
+      - name: DEBUG – show workspace after download
+        run: |
+          echo "=== workspace tree (2 levels) ==="
+          find . -maxdepth 2 -type f -print
+
       - name: Combine & report
         run: |
           coverage combine coverage-*/.coverage        # ← combine パスは前回修正どおり
