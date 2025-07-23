@@ -30,7 +30,8 @@ jobs:
 
       # テスト (サブセット)
       - name: Run pytest subset
-        run: pytest --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
+        run: pytest --cov=core --cov-branch --cov-report=term \
+                    --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
 
       # カバレッジ結果をアップロード
       - uses: actions/upload-artifact@v4
