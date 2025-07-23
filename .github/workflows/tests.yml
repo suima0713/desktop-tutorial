@@ -50,13 +50,22 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      # … checkout / setup-python / pip install coverage …
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      # ★インストールを戻す――ここが消えていた
+      - name: Install coverage CLI
+        run: pip install coverage
 
       - uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
 
-      - run: |
-          # combine パスを修正
-          coverage combine coverage-*/.coverage
+      - name: Combine & report
+        run: |
+          coverage combine coverage-*/.coverage        # ← combine パスは前回修正どおり
           coverage report --fail-under=80
