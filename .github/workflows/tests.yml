@@ -50,21 +50,13 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # … checkout / setup-python / pip install coverage …
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-
-      - run: pip install coverage
-
-      # 各ジョブ出力の .coverage ファイルを取得
       - uses: actions/download-artifact@v4
         with:
-          pattern: coverage-*   # path を指定しない＝既定ディレクトリへ展開
+          pattern: coverage-*
 
-      # カバレッジを結合してレポート
       - run: |
-          coverage combine coverage*/.coverage*
+          # combine パスを修正
+          coverage combine coverage-*/.coverage
           coverage report --fail-under=80
