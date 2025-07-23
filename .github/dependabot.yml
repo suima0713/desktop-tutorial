@@ -2,16 +2,23 @@ version: 2
 updates:
   # Python dependencies
   - package-ecosystem: "pip"
-    directory: "/"                # requirements*.txt がある場所
+    directory: "/"
     schedule:
       interval: "weekly"
-    commit-message:
-      prefix: "deps(pip)"
+    open-pull-requests-limit: 5
+    groups:
+      lint:
+        patterns:
+          - "pre-commit"
+          - "ruff*"
+    ignore:
+      # cyclonedx 依存で競合するバージョン例
+      - dependency-name: "py-serializable"
+        versions: ["2.x"]
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
-    directory: "/"                # .github/workflows
+    directory: "/"
     schedule:
       interval: "weekly"
-    commit-message:
-      prefix: "deps(actions)"
+    open-pull-requests-limit: 5
