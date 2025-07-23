@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5]
-        total-splits: [5]
+        group: [1, 2]
+        total-splits: [2]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
