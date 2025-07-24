@@ -31,10 +31,15 @@ jobs:
       # ----- ここがポイント -----
       # ① COVERAGE_FILE 変数だけを渡す（glob/絶対パスにしない）
       # ② if-no-files-found を "error" にしておくと、次回から迷わない
+      - name: Prepare artifact folder
+        run: |
+          mkdir -p coverage-files
+          mv "${COVERAGE_FILE}" coverage-files/
+
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ env.COVERAGE_FILE }}
+          path: coverage-files/
           if-no-files-found: error
 #------------------------------------------------------------
 # coverage job  (combine だけ変えれば良い)
