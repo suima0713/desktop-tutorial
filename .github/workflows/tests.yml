@@ -1,59 +1,44 @@
-name: tests                          # 任意
-on: [push, pull_request]             # ← 追加
+name: tests
+on: [push, pull_request]
 
 jobs:
   tests:
     runs-on: ubuntu-latest
-    env:
-      COVERAGE_FILE: .coverage.${{ matrix.group }}
     strategy:
-      matrix:
-        group: [1, 2]
-        total-splits: [2]
+      matrix: {group: [1, 2], total-splits: [2]}
+
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
       - run: pip install -r requirements-dev.txt
+      - run: pip install -e .
 
-      - name: Install package (editable)
-        run: pip install -e .
-
-      - name: Set coverage file name
-        id: setcov
-        run: echo "coverage_file=.coverage.${{ matrix.group }}" >> "$GITHUB_OUTPUT"
-
-      - name: Run pytest subset
-        run: |
+      # 1. pytest + coverage
+      - run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
 
-      - name: Debug – list coverage files
-        shell: bash
-        run: ls -alh .coverage*
+      # 2. リネームして dotfile 問題を回避
+      - run: mv .coverage.${{ matrix.group }} coverage_${{ matrix.group }}
 
-      - name: Rename coverage file
-        run: mv .coverage.${{ matrix.group }} coverage_${{ matrix.group }}
-
+      # 3. artifacts
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
           path: coverage_${{ matrix.group }}
+          retention-days: 30
           if-no-files-found: error
 
-  coverage:                   # ← このジョブが無いと一覧に出ない
-    needs: tests              # tests と一致していること
+  coverage:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
+        with: {python-version: '3.12'}
       - run: pip install coverage
 
       - uses: actions/download-artifact@v4
@@ -61,9 +46,6 @@ jobs:
           pattern: coverage-*
           merge-multiple: true
 
-      - name: Combine & report
-        shell: bash
-        run: |
-          files=(coverage_*)
-          coverage combine "${files[@]}"
+      - run: |
+          coverage combine coverage_*
           coverage report --fail-under=80
