@@ -10,9 +10,7 @@ jobs:
       matrix:
         group: [1, 2]
         total-splits: [2]
-
     steps:
-      # 既存ステップ -------------------------------------------------
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
@@ -25,12 +23,9 @@ jobs:
       - name: Install package (editable)
         run: pip install -e .
 
-      # ここから追加ステップ ----------------------------------------
       - name: Set coverage file name
-        run: echo "COVERAGE_FILE=.coverage.${{ matrix.group }}" >> $GITHUB_ENV
-
-      - name: Ensure coverage file exists
-        run: test -f "$COVERAGE_FILE" || touch "$COVERAGE_FILE"
+        id: setcov
+        run: echo "coverage_file=.coverage.${{ matrix.group }}" >> "$GITHUB_OUTPUT"
 
       - name: Run pytest subset
         run: |
@@ -44,7 +39,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ env.COVERAGE_FILE }}
+          path: ${{ steps.setcov.outputs.coverage_file }}
 
   coverage:                   # ← このジョブが無いと一覧に出ない
     needs: tests              # tests と一致していること
