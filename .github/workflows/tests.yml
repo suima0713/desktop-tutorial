@@ -18,29 +18,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - run: pip install -r requirements-dev.txt
-      - run: pip install -e .
-
-      # ───── test 実行 ────────────────────────────────
-      - name: Run pytest subset
-        run: |
-          pytest --cov=core --cov-branch --cov-report=term \
-                 --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
-
-      # ───── デバッグ：本当に出来ているか ───────────────
+      - uses: actions/setup-python@v5 …
+      - run: pytest …               # ←カバレッジ生成
       - run: ls -alh "${COVERAGE_FILE}"
 
-      # ───── 生成された .coverage.N をそのままアップロード ─
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4   # ←直にアップロード
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ env.COVERAGE_FILE }}   # ← ここを絶対に変えない
+          path: ${{ env.COVERAGE_FILE }}
           if-no-files-found: error
 
   ####################################################################
