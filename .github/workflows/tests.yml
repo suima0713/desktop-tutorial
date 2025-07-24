@@ -32,13 +32,15 @@ jobs:
       - name: Ensure coverage file exists
         run: test -f "$COVERAGE_FILE" || touch "$COVERAGE_FILE"
 
-      # pytest 実行 -------------------------------------------------
       - name: Run pytest subset
         run: |
-          pytest --cov=core --cov-branch --cov-report=term --cov-fail-under=0 \
+          pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
 
-      # アップロード -----------------------------------------------
+      - name: Debug – list coverage files
+        shell: bash
+        run: ls -alh .coverage*
+
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
@@ -64,5 +66,7 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          coverage combine .coverage*
+          files=(.coverage*)
+          echo "Combining ${#files[@]} files: ${files[@]}"
+          coverage combine "${files[@]}"
           coverage report --fail-under=80
