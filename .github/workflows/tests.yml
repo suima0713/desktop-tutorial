@@ -1,71 +1,54 @@
 name: tests
 on: [push, pull_request]
 
-######################################################################
-# 1) pytest を 2 グループ並列実行し .coverage.<N> を直接アップロード
-######################################################################
 jobs:
   tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1, 2]          # グループ番号
-        total_splits: [2]      # 総分割数
-      fail-fast: false         # 片方失敗でももう片方を継続
+        group: [1, 2]
+        total_splits: [2]
+      fail-fast: false
 
     env:
       COVERAGE_FILE: .coverage.${{ matrix.group }}
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-
       - run: pip install -r requirements-dev.txt
       - run: pip install -e .
 
-      # ───── pytest 実行 ───────────────────────────────
       - name: Run pytest subset
         run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
 
-      # （任意）デバッグ
       - run: ls -alh "${COVERAGE_FILE}"
 
-      # ───── .coverage.N を“絶対パス”でアップロード ─────
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          # ↓ github.workspace は /home/runner/work/<repo>/<repo>
-          path: ${{ github.workspace }}/${{ env.COVERAGE_FILE }}
+          path: "**/.coverage.${{ matrix.group }}"
           if-no-files-found: error
 
-######################################################################
-# 2) coverage-* をダウンロード → combine → report
-######################################################################
   coverage:
     needs: tests
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-
-      - run: pip install coverage     # coverage CLI
-
+      - run: pip install coverage
       - uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
-          merge-multiple: true        # 2 個とも同じ階層へ展開
-
+          merge-multiple: true
       - name: Combine & report
         shell: bash
         run: |
