@@ -4,49 +4,66 @@ on: [push, pull_request]
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      # ← ここで group ごとに固有名を確実に設定
+      COVERAGE_FILE: .coverage.${{ matrix.group }}
     strategy:
-      matrix: {group: [1, 2], total-splits: [2]}
       fail-fast: false
-
+      matrix:
+        group:        [1, 2]   # ← pytest-split のグループ数
+        total-splits: [2]
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
       - run: pip install -r requirements-dev.txt
-      - run: pip install -e .
+      - name: Install package (editable)
+        run: pip install -e .
 
-      # 1. pytest + coverage
-      - run: |
+      # --- pytest 実行 ---
+      - name: Run pytest subset
+        run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
 
-      # 2. リネームして dotfile 問題を回避
-      - run: mv .coverage.${{ matrix.group }} coverage_${{ matrix.group }}
+      # --- debug: 生成されたファイルを確認（残しておくと安心） ---
+      - name: Debug – list coverage files
+        shell: bash
+        run: ls -alh ${{ env.COVERAGE_FILE }}*
 
-      # 3. artifacts
+      # --- artifact アップロード ---
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: coverage_${{ matrix.group }}
-          retention-days: 30
-          if-no-files-found: error
+          path: ${{ github.workspace }}/${{ env.COVERAGE_FILE }}
 
+  # ------------------------------------------------------------------
   coverage:
     needs: tests
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: '3.12'}
+        with:
+          python-version: '3.12'
+
       - run: pip install coverage
 
+      # download したい artifact 名をワイルドカードで指定
       - uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
           merge-multiple: true
 
-      - run: |
-          coverage combine coverage_*
+      - name: Combine & report
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(${{ github.workspace }}/.coverage.*)
+          echo "Combining ${#files[@]} file(s): ${files[@]}"
+          coverage combine "${files[@]}"
           coverage report --fail-under=80
