@@ -36,10 +36,14 @@ jobs:
         shell: bash
         run: ls -alh .coverage*
 
+      - name: Rename coverage file
+        run: mv .coverage.${{ matrix.group }} coverage_${{ matrix.group }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ github.workspace }}/.coverage.${{ matrix.group }}
+          path: coverage_${{ matrix.group }}
+          if-no-files-found: error
 
   coverage:                   # ← このジョブが無いと一覧に出ない
     needs: tests              # tests と一致していること
@@ -60,8 +64,6 @@ jobs:
       - name: Combine & report
         shell: bash
         run: |
-          shopt -s nullglob
-          files=(.coverage.*)
-          echo "Combining ${#files[@]} files: ${files[@]}"
+          files=(coverage_*)
           coverage combine "${files[@]}"
           coverage report --fail-under=80
