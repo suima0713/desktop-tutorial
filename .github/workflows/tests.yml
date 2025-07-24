@@ -4,44 +4,41 @@ on: [push, pull_request]
 jobs:
   tests:
     runs-on: ubuntu-latest
-    env:
-      # ← ここで group ごとに固有名を確実に設定
-      COVERAGE_FILE: .coverage.${{ matrix.group }}
     strategy:
       fail-fast: false
       matrix:
-        group:        [1, 2]   # ← pytest-split のグループ数
+        group:        [1, 2]
         total-splits: [2]
+
+    env:
+      COVERAGE_FILE: .coverage.${{ matrix.group }}   # ← ここだけで “名前” を決定
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip'
-
       - run: pip install -r requirements-dev.txt
-      - name: Install package (editable)
-        run: pip install -e .
+      - run: pip install -e .
 
-      # --- pytest 実行 ---
       - name: Run pytest subset
         run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
 
-      # --- debug: 生成されたファイルを確認（残しておくと安心） ---
       - name: Debug – list coverage files
-        shell: bash
-        run: ls -alh ${{ env.COVERAGE_FILE }}*
+        run: ls -alh "${COVERAGE_FILE}"
 
-      # --- artifact アップロード ---
+      # ----- ここがポイント -----
+      # ① COVERAGE_FILE 変数だけを渡す（glob/絶対パスにしない）
+      # ② if-no-files-found を "error" にしておくと、次回から迷わない
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ github.workspace }}/${{ env.COVERAGE_FILE }}
-
-  # ------------------------------------------------------------------
+          path: ${{ env.COVERAGE_FILE }}
+          if-no-files-found: error
+#------------------------------------------------------------
+# coverage job  (combine だけ変えれば良い)
+#------------------------------------------------------------
   coverage:
     needs: tests
     runs-on: ubuntu-latest
@@ -50,20 +47,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - run: pip install coverage
 
-      # download したい artifact 名をワイルドカードで指定
       - uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
           merge-multiple: true
 
       - name: Combine & report
-        shell: bash
         run: |
           shopt -s nullglob
-          files=(${{ github.workspace }}/.coverage.*)
+          files=(.coverage.*)              # ← ワークスペース直下を glob
           echo "Combining ${#files[@]} file(s): ${files[@]}"
           coverage combine "${files[@]}"
           coverage report --fail-under=80
