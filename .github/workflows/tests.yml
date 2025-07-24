@@ -39,7 +39,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ steps.setcov.outputs.coverage_file }}
+          path: ".coverage.*"
 
   coverage:                   # ← このジョブが無いと一覧に出ない
     needs: tests              # tests と一致していること
