@@ -43,3 +43,26 @@ jobs:
         with:
           name: coverage-${{ matrix.group }}
           path: ${{ env.COVERAGE_FILE }}
+
+  coverage:                   # ← このジョブが無いと一覧に出ない
+    needs: tests              # tests と一致していること
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install coverage
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+
+      - name: Combine & report
+        shell: bash
+        run: |
+          shopt -s nullglob
+          coverage combine .coverage.*
+          coverage report --fail-under=80
