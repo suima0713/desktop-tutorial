@@ -42,7 +42,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ env.COVERAGE_FILE }}
+          path: ".coverage*"
 
   coverage:                   # ← このジョブが無いと一覧に出ない
     needs: tests              # tests と一致していること
@@ -64,5 +64,5 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          coverage combine .coverage.*
+          coverage combine .coverage*
           coverage report --fail-under=80
