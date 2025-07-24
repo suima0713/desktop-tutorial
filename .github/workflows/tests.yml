@@ -1,69 +1,99 @@
-name: tests
-on: [push, pull_request]
+name: tests                    # ワークフロー名
+on: [push, pull_request]       # 任意で変更可
 
 jobs:
+  ######################################################################
+  # 1) pytest を 2 グループ並列実行し、グループごとに .coverage.X を生成
+  ######################################################################
   tests:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        group:        [1, 2]
-        total-splits: [2]
 
+    # 並列化設定 ── 例：グループ 1 / 2
+    strategy:
+      matrix:
+        group: [1, 2]          # ← グループ番号
+        total_splits: [2]      # ← 総分割数
+      fail-fast: false         # 片方失敗でももう片方を継続
+
+    # === ここで COVERAGE_FILE 環境変数を確定しておく ===================
     env:
-      COVERAGE_FILE: .coverage.${{ matrix.group }}   # ← ここだけで “名前” を決定
+      COVERAGE_FILE: .coverage.${{ matrix.group }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
+          cache: pip
+
       - run: pip install -r requirements-dev.txt
       - run: pip install -e .
 
+      #---------------------------------------------------------------
+      # pytest 実行（グループごとに --splits / --group を渡す）
+      #---------------------------------------------------------------
       - name: Run pytest subset
         run: |
           pytest --cov=core --cov-branch --cov-report=term \
-                 --splits ${{ matrix.total-splits }} --group ${{ matrix.group }}
+                 --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
 
+      # *.coverage.N が出来ているか確認  (デバッグ用。問題なければ削除可)
       - name: Debug – list coverage files
         run: ls -alh "${COVERAGE_FILE}"
 
-      # ----- ここがポイント -----
-      # ① COVERAGE_FILE 変数だけを渡す（glob/絶対パスにしない）
-      # ② if-no-files-found を "error" にしておくと、次回から迷わない
+      #---------------------------------------------------------------
+      # アーティファクト用フォルダーを作り移動させる
+      #---------------------------------------------------------------
       - name: Prepare artifact folder
         run: |
           mkdir -p coverage-files
-          mv "${{ github.workspace }}/${COVERAGE_FILE}" coverage-files/
+          mv "${COVERAGE_FILE}" coverage-files/
           ls -alh coverage-files
 
+      #---------------------------------------------------------------
+      # グループごとの .coverage.* をアップロード
+      #---------------------------------------------------------------
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: coverage-files/
-          if-no-files-found: error
-#------------------------------------------------------------
-# coverage job  (combine だけ変えれば良い)
-#------------------------------------------------------------
+          path: coverage-files/           # ← ディレクトリアップロード
+          if-no-files-found: error        # ファイルが無い場合は失敗
+
+  ######################################################################
+  # 2) 生成された 2 つの .coverage.* をダウンロードして結合＆レポート
+  ######################################################################
   coverage:
-    needs: tests
+    needs: tests             # tests ジョブ完了後に実行
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      - run: pip install coverage
+          python-version: "3.12"
+          cache: pip
 
+      - run: pip install coverage        # coverage CLI を使うだけ
+
+      # すべての artifacts を DL。merge‑multiple: true で重複ディレクトリを統合
       - uses: actions/download-artifact@v4
         with:
-          pattern: coverage-*
-          merge-multiple: true
+          pattern: coverage-*            # tests で付けた名前パターン
+          merge-multiple: true           # coverage-files/ 内に 2 つ入る
 
+      # 結合 ＆ レポート（80% 未満なら失敗）
       - name: Combine & report
+        shell: bash
         run: |
-          shopt -s nullglob
-          files=(.coverage.*)              # ← ワークスペース直下を glob
-          echo "Combining ${#files[@]} file(s): ${files[@]}"
+          shopt -s nullglob              # *.coverage.* が無ければ空配列
+          files=(coverage-files/.coverage.*)
+          echo "Found ${#files[@]} file(s): ${files[*]}"
+
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "❌ No coverage files found"; exit 1
+          fi
+
           coverage combine "${files[@]}"
           coverage report --fail-under=80
