@@ -7,93 +7,66 @@ jobs:
   ######################################################################
   tests:
     runs-on: ubuntu-latest
-
-    # 並列化設定 ── 例：グループ 1 / 2
     strategy:
       matrix:
-        group: [1, 2]          # ← グループ番号
-        total_splits: [2]      # ← 総分割数
-      fail-fast: false         # 片方失敗でももう片方を継続
+        group: [1, 2]
+        total_splits: [2]
+      fail-fast: false
 
-    # === ここで COVERAGE_FILE 環境変数を確定しておく ===================
     env:
       COVERAGE_FILE: .coverage.${{ matrix.group }}
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-
       - run: pip install -r requirements-dev.txt
       - run: pip install -e .
 
-      #---------------------------------------------------------------
-      # pytest 実行（グループごとに --splits / --group を渡す）
-      #---------------------------------------------------------------
       - name: Run pytest subset
         run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
 
-      # *.coverage.N が出来ているか確認  (デバッグ用。問題なければ削除可)
-      - name: Debug – list coverage files
-        run: ls -alh "${COVERAGE_FILE}"
+      # デバッグ用 – 本当に出来ているか確認
+      - run: ls -alh "${COVERAGE_FILE}"
 
-      #---------------------------------------------------------------
-      # アーティファクト用フォルダーを作り移動させる
-      #---------------------------------------------------------------
-      - name: Prepare artifact folder
-        run: |
-          mkdir -p coverage-files
-          mv "${COVERAGE_FILE}" coverage-files/
-          ls -alh coverage-files
-
-      #---------------------------------------------------------------
-      # グループごとの .coverage.* をアップロード
-      #---------------------------------------------------------------
+      # ❶ ファイルを **そのまま** アップロード
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: coverage-files/           # ← ディレクトリアップロード
-          if-no-files-found: error        # ファイルが無い場合は失敗
+          path: ${{ env.COVERAGE_FILE }}   # ← ここをフォルダではなくファイルに
+          if-no-files-found: error
 
   ######################################################################
   # 2) 生成された 2 つの .coverage.* をダウンロードして結合＆レポート
   ######################################################################
   coverage:
-    needs: tests             # tests ジョブ完了後に実行
+    needs: tests
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
+      - run: pip install coverage
 
-      - run: pip install coverage        # coverage CLI を使うだけ
-
-      # すべての artifacts を DL。merge‑multiple: true で重複ディレクトリを統合
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4   # ❷
         with:
-          pattern: coverage-*            # tests で付けた名前パターン
-          merge-multiple: true           # coverage-files/ 内に 2 つ入る
+          pattern: coverage-*                # tests 側で付けた名前
+          merge-multiple: true               # 同一フォルダへ展開
 
-      # 結合 ＆ レポート（80% 未満なら失敗）
       - name: Combine & report
         shell: bash
         run: |
-          shopt -s nullglob              # *.coverage.* が無ければ空配列
-          files=(coverage-files/.coverage.*)
-          echo "Found ${#files[@]} file(s): ${files[*]}"
-
-          if [[ ${#files[@]} -eq 0 ]]; then
-            echo "❌ No coverage files found"; exit 1
+          shopt -s nullglob
+          files=(coverage-*/.coverage.* .coverage.*)  # ❸ どこに落ちても拾える
+          echo "Found ${#files[@]} coverage file(s): ${files[*]}"
+          if [[ ${#files[@]} -lt 2 ]]; then
+            echo "❌ 少なくとも 2 ファイル必要です"; exit 1
           fi
-
           coverage combine "${files[@]}"
           coverage report --fail-under=80
