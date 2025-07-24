@@ -9,7 +9,6 @@ jobs:
         group: [1, 2]
         total_splits: [2]
       fail-fast: false
-
     env:
       COVERAGE_FILE: .coverage.${{ matrix.group }}
 
@@ -21,18 +20,19 @@ jobs:
           cache: pip
       - run: pip install -r requirements-dev.txt
       - run: pip install -e .
-
       - name: Run pytest subset
         run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
 
-      - run: ls -alh "${COVERAGE_FILE}"
+      # コピーして通常名に
+      - name: Copy for artifact
+        run: cp "${COVERAGE_FILE}" "coverage-${{ matrix.group }}.cov"
 
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: "**/.coverage.${{ matrix.group }}"
+          path: coverage-${{ matrix.group }}.cov
           if-no-files-found: error
 
   coverage:
@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          files=(coverage-*/.coverage.* .coverage.*)
+          files=(coverage-*/coverage-*.cov)
           echo "Found ${#files[@]} coverage file(s): ${files[*]}"
           if [[ ${#files[@]} -lt 2 ]]; then
             echo "❌ coverage ファイルが 2 つ揃いません"; exit 1
