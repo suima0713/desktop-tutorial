@@ -58,6 +58,12 @@ jobs:
           # .coverage.* が複数ある時だけ combine
           if ls .coverage.* 1>/dev/null 2>&1; then
             python -m coverage combine
+
+          shopt -s nullglob
+          files=(coverage-*.cov)
+          echo "Found ${#files[@]} coverage file(s): ${files[*]}"
+          if [[ ${#files[@]} -lt 2 ]]; then
+            echo "❌ coverage ファイルが 2 つ揃いません"; exit 1
           fi
           # 単一 .coverage があれば XML 化
           if [ -f .coverage ]; then
