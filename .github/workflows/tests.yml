@@ -1,10 +1,10 @@
-name: tests                    # ワークフロー名
-on: [push, pull_request]       # 任意で変更可
+name: tests
+on: [push, pull_request]
 
 jobs:
-  ######################################################################
-  # 1) pytest を 2 グループ並列実行し、グループごとに .coverage.X を生成
-  ######################################################################
+  ####################################################################
+  # 1) pytest を 2 グループ並列実行
+  ####################################################################
   tests:
     runs-on: ubuntu-latest
     strategy:
@@ -18,55 +18,60 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
+
       - run: pip install -r requirements-dev.txt
       - run: pip install -e .
 
+      # ───── test 実行 ────────────────────────────────
       - name: Run pytest subset
         run: |
           pytest --cov=core --cov-branch --cov-report=term \
                  --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
 
-      # デバッグ用 – 本当に出来ているか確認
+      # ───── デバッグ：本当に出来ているか ───────────────
       - run: ls -alh "${COVERAGE_FILE}"
 
-      # ❶ ファイルを **そのまま** アップロード
+      # ───── 生成された .coverage.N をそのままアップロード ─
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: ${{ env.COVERAGE_FILE }}   # ← ここをフォルダではなくファイルに
+          path: ${{ env.COVERAGE_FILE }}   # ← ここを絶対に変えない
           if-no-files-found: error
 
-  ######################################################################
-  # 2) 生成された 2 つの .coverage.* をダウンロードして結合＆レポート
-  ######################################################################
+  ####################################################################
+  # 2) coverage-* を DL → combine → report
+  ####################################################################
   coverage:
     needs: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
+
       - run: pip install coverage
 
-      - uses: actions/download-artifact@v4   # ❷
+      - uses: actions/download-artifact@v4
         with:
-          pattern: coverage-*                # tests 側で付けた名前
-          merge-multiple: true               # 同一フォルダへ展開
+          pattern: coverage-*
+          merge-multiple: true
 
       - name: Combine & report
         shell: bash
         run: |
           shopt -s nullglob
-          files=(coverage-*/.coverage.* .coverage.*)  # ❸ どこに落ちても拾える
+          files=(coverage-*/.coverage.* .coverage.*)
           echo "Found ${#files[@]} coverage file(s): ${files[*]}"
           if [[ ${#files[@]} -lt 2 ]]; then
-            echo "❌ 少なくとも 2 ファイル必要です"; exit 1
+            echo "❌ coverage ファイルが 2 つ揃いません"; exit 1
           fi
           coverage combine "${files[@]}"
           coverage report --fail-under=80
