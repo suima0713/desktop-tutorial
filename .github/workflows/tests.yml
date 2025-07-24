@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          files=(coverage-*/coverage-*.cov)
+          files=(coverage-*.cov)
           echo "Found ${#files[@]} coverage file(s): ${files[*]}"
           if [[ ${#files[@]} -lt 2 ]]; then
             echo "❌ coverage ファイルが 2 つ揃いません"; exit 1
