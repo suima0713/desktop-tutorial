@@ -3,8 +3,12 @@ name: CI Tests                            # ① ワークフロー名
 on:                                       # ② トリガー
   push:
     branches: [main]
+    paths-ignore:
+      - 'coverage.svg'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'coverage.svg'
 
 permissions:
   contents: read

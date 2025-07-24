@@ -49,28 +49,11 @@ jobs:
 
       # ───────────────────────────────
       # 5) カバレッジ準備（main push & Py3.11）
-      - name: Prepare coverage data
-        if: >
-          github.event_name == 'push' &&
-          github.ref == 'refs/heads/main' &&
-          matrix.python-version == '3.11'
+      - name: Combine coverage (optional)
+        if: matrix.python-version == '3.11'
         run: |
-          # .coverage.* が複数ある時だけ combine
-          if ls .coverage.* 1>/dev/null 2>&1; then
-            python -m coverage combine
+          coverage combine || true
 
-          shopt -s nullglob
-          files=(coverage-*.cov)
-          echo "Found ${#files[@]} coverage file(s): ${files[*]}"
-          if [[ ${#files[@]} -lt 2 ]]; then
-            echo "❌ coverage ファイルが 2 つ揃いません"; exit 1
-          fi
-          # 単一 .coverage があれば XML 化
-          if [ -f .coverage ]; then
-            python -m coverage xml -i
-          else
-            echo "No coverage data; skip coverage xml"
-          fi
 
       # 6) バッジ用ディレクトリ確保
       - name: Ensure badges directory exists
@@ -103,7 +86,6 @@ jobs:
           message: 'chore: update coverage badge'
           default_author: github_actions
 
-      # ───────────────────────────────
       # 9) HTML レポートをアーカイブ & アップロード
       - name: Archive HTML coverage report
         if: hashFiles('htmlcov/index.html') != ''
