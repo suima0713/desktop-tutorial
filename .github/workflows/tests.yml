@@ -39,7 +39,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.group }}
-          path: "${{ github.workspace }}/.coverage.${{ matrix.group }}"
+          path: "**/.coverage.${{ matrix.group }}"
 
   coverage:                   # ← このジョブが無いと一覧に出ない
     needs: tests              # tests と一致していること
