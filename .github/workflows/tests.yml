@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: {group: [1, 2], total-splits: [2]}
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
