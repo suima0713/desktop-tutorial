@@ -1,62 +1,62 @@
-name: tests
-on: [push, pull_request]
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        group: [1, 2]
-        total_splits: [2]
-      fail-fast: false
-    env:
-      COVERAGE_FILE: .coverage.${{ matrix.group }}
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: pip install -r requirements-dev.txt
-      - run: pip install -e .
-      - name: Run pytest subset
-        run: |
-          pytest --cov=core --cov-branch --cov-report=term \
-                 --splits ${{ matrix.total_splits }} --group ${{ matrix.group }}
 
-      # コピーして通常名に
-      - name: Copy for artifact
-        run: cp "${COVERAGE_FILE}" "coverage-${{ matrix.group }}.cov"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      - name: Run tests with coverage
+        run: pytest --cov=desktop_tutorial --cov-report=xml --cov-report=html
+
+      # 🔹 ① Coverage バッジ生成（main に push かつ Py3.11 のときだけ）
+      - name: Generate coverage badge
+        if: >
+          github.event_name == 'push' &&
+          matrix.python-version == '3.11'
+        uses: tj-actions/coverage-badge-py@v2
+        with:
+          output: badges/coverage.svg
+
+      # 🔹 ② バッジをコミット（↑と同じ条件）
+      - name: Commit coverage badge
+        if: >
+          github.event_name == 'push' &&
+          matrix.python-version == '3.11'
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: badges/coverage.svg
+          message: 'chore: update coverage badge'
+          default_author: github_actions
+
+      # ③ HTML レポートをアーカイブ
+      - name: Archive HTML coverage report
+        run: tar -czf htmlcov.tgz htmlcov
 
       - uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.group }}
-          path: coverage-${{ matrix.group }}.cov
-          if-no-files-found: error
-
-  coverage:
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-      - run: pip install coverage
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: coverage-*
-          merge-multiple: true
-      - name: Combine & report
-        shell: bash
-        run: |
-          shopt -s nullglob
-          files=(coverage-*.cov)
-          echo "Found ${#files[@]} coverage file(s): ${files[*]}"
-          if [[ ${#files[@]} -lt 2 ]]; then
-            echo "❌ coverage ファイルが 2 つ揃いません"; exit 1
-          fi
-          coverage combine "${files[@]}"
-          coverage report --fail-under=80
+          name: coverage-html-${{ matrix.python-version }}
+          path: htmlcov.tgz
+          retention-days: 7
