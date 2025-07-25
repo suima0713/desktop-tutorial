@@ -36,12 +36,10 @@ jobs:
                  --cov-fail-under=5
 
       - name: Prepare coverage data
-        if: hashFiles('.coverage') != ''
-        run: |
-          python -m coverage combine || true
-          python -m coverage xml -i
-      - name: Prepare coverage data
-        if: github.event_name == 'push' && matrix.python-version == '3.11'
+        if: >
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
         run: |
           python -m coverage combine || true
           if [ -f .coverage ]; then
@@ -56,7 +54,10 @@ jobs:
 
       # 🔹 ① Coverage バッジ生成（main に push かつ Py3.11 のときだけ）
       - name: Generate coverage badge
-        if: github.event_name == 'push' && matrix.python-version == '3.11'
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
         uses: tj-actions/coverage-badge-py@v2
         with:
           output: badges/coverage.svg
@@ -64,7 +65,10 @@ jobs:
 
       # 🔹 ② バッジをコミット（↑と同じ条件）
       - name: Commit coverage badge
-        if: github.event_name == 'push' && matrix.python-version == '3.11'
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
         uses: EndBug/add-and-commit@v9
         with:
           add: badges/coverage.svg
