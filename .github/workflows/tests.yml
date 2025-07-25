@@ -29,7 +29,10 @@ jobs:
           pip install -e .
 
       - name: Run tests with coverage
-        run: pytest --cov=desktop_tutorial --cov-report=xml --cov-report=html
+        run:  |
+          pytest --cov=desktop_tutorial \
+                 --cov-report=xml \
+                 --cov-report=html:htmlcov
 
       # 🔹 ① Coverage バッジ生成（main に push かつ Py3.11 のときだけ）
       - name: Generate coverage badge
@@ -53,9 +56,12 @@ jobs:
 
       # ③ HTML レポートをアーカイブ
       - name: Archive HTML coverage report
+        if: hashFiles('htmlcov/index.html') != ''
         run: tar -czf htmlcov.tgz htmlcov
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload coverage artifact
+        if: success() && hashFiles('htmlcov/index.html') != ''
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-html-${{ matrix.python-version }}
           path: htmlcov.tgz
