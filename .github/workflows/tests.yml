@@ -43,8 +43,12 @@ jobs:
       - name: Prepare coverage data
         if: github.event_name == 'push' && matrix.python-version == '3.11'
         run: |
-          python -m coverage combine
-          python -m coverage xml -i
+          python -m coverage combine || true
+          if [ -f .coverage ]; then
+            python -m coverage xml -i
+          else
+            echo "No coverage data; skip coverage xml"
+          fi
 
       # 🔹 ① Coverage バッジ生成（main に push かつ Py3.11 のときだけ）
       - name: Generate coverage badge
