@@ -33,7 +33,7 @@ jobs:
           pytest --cov=. \
                  --cov-report=xml \
                  --cov-report=html:htmlcov \
-                 --fail-under=5
+                 --cov-fail-under=5
 
       - name: Prepare coverage data
         if: hashFiles('.coverage') != ''
