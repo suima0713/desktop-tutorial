@@ -1,4 +1,4 @@
-name: Tests
+name: Tests & Coverage
 
 on:
   push:
@@ -9,61 +9,87 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write          # ① バッジ commit 用。job‑level に限定
 
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
 
     steps:
+      # ───────────────────────────────
+      # 1) Checkout（完全履歴）
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # 2) Python セットアップ + pip cache
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+          cache-dependency-path: requirements-dev.txt  # ② ハッシュキーに反映
 
+      # 3) 依存インストール
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
           pip install -e .
 
+      # ───────────────────────────────
+      # 4) テスト実行 + カバレッジ
       - name: Run tests with coverage
-        run:  |
-          pytest --cov=. \
+        run: |
+          pytest -q --tb=short \
+                 --cov=. \
                  --cov-report=xml \
                  --cov-report=html:htmlcov \
-                 --cov-fail-under=5
+                 --cov-fail-under=5          # 5 % 未満で fail
 
+      # ───────────────────────────────
+      # 5) カバレッジ準備（main push & Py3.11）
       - name: Prepare coverage data
-        if: hashFiles('.coverage') != ''
+        if: >
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
         run: |
-          python -m coverage combine || true
-          python -m coverage xml -i
-      - name: Prepare coverage data
-        if: github.event_name == 'push' && matrix.python-version == '3.11'
-        run: |
-          python -m coverage combine || true
+          # .coverage.* が複数ある時だけ combine
+          if ls .coverage.* 1>/dev/null 2>&1; then
+            python -m coverage combine
+          fi
+          # 単一 .coverage があれば XML 化
           if [ -f .coverage ]; then
             python -m coverage xml -i
           else
             echo "No coverage data; skip coverage xml"
           fi
 
-      # 🔹 ① Coverage バッジ生成（main に push かつ Py3.11 のときだけ）
+      # 6) バッジ用ディレクトリ確保
+      - name: Ensure badges directory exists
+        if: >
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
+        run: mkdir -p badges
+
+      # 7) カバレッジバッジ生成
       - name: Generate coverage badge
         if: >
           github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
           matrix.python-version == '3.11'
         uses: tj-actions/coverage-badge-py@v2
         with:
           output: badges/coverage.svg
           overwrite: true
 
-      # 🔹 ② バッジをコミット（↑と同じ条件）
+      # 8) バッジコミット
       - name: Commit coverage badge
         if: >
           github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
           matrix.python-version == '3.11'
         uses: EndBug/add-and-commit@v9
         with:
@@ -71,7 +97,8 @@ jobs:
           message: 'chore: update coverage badge'
           default_author: github_actions
 
-      # ③ HTML レポートをアーカイブ
+      # ───────────────────────────────
+      # 9) HTML レポートをアーカイブ & アップロード
       - name: Archive HTML coverage report
         if: hashFiles('htmlcov/index.html') != ''
         run: tar -czf htmlcov.tgz htmlcov
