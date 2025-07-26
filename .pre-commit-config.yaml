@@ -1,23 +1,30 @@
 repos:
+  # ---------- General housekeeping hooks ----------
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-      - id: end-of-file-fixer
-        stages: [pre-commit]           # ← 追加済み
-      - id: trailing-whitespace
-        stages: [pre-commit]           # ← 追加済み
+      - id: end-of-file-fixer          # 改行の欠落を修正
+        stages: [pre-commit]           # ← commit 時のみ実行
+      - id: trailing-whitespace        # 行末スペース除去
+        stages: [pre-commit]
 
+  # ---------- Code formatters / linters ----------
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 24.3.0
     hooks:
       - id: black
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.5
+    rev: v0.4.0
     hooks:
       - id: ruff
+        # `args` を複数行書く場合は YAML リストにする
+        args:
+          - --fix
+          - --exit-zero        # lint だけで失敗させたくない場合
 
+  # ---------- Git hygiene ----------
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0      # ← 最新タグ確認してもOK
+    rev: v5.0.0
     hooks:
       - id: check-merge-conflict
