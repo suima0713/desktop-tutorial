@@ -64,26 +64,25 @@ jobs:
 
       # 7) カバレッジバッジ生成
       - name: Generate coverage badge
-        if: >
+        if: |
           github.event_name == 'push' &&
           github.ref == 'refs/heads/main' &&
           matrix.python-version == '3.11'
         uses: tj-actions/coverage-badge-py@v2
         with:
-          output: badges/coverage.svg
+          output: coverage.svg
           overwrite: true
 
       # 8) バッジコミット
-      - name: Commit coverage badge
-        if: >
-          github.event_name == 'push' &&
+      - name: Commit badge
+        if: |
           github.ref == 'refs/heads/main' &&
+          github.event_name == 'push' &&
           matrix.python-version == '3.11'
         uses: EndBug/add-and-commit@v9
         with:
-          add: badges/coverage.svg
+          add: coverage.svg
           message: 'chore: update coverage badge'
-          default_author: github_actions
 
       # 9) HTML レポートをアーカイブ & アップロード
       - name: Archive HTML coverage report
