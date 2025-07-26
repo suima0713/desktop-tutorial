@@ -1,22 +1,27 @@
 version: 2
+
 updates:
-  # Python dependencies
+  # ---------------- Python dependencies ----------------
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+
+    # PR グループ化（例：lint 系をまとめる）
     groups:
       lint:
         patterns:
           - "pre-commit"
           - "ruff*"
-    ignore:
-      # cyclonedx 依存で競合するバージョン例
-      - dependency-name: "py-serializable"
-        versions: ["2.x"]
 
-  # GitHub Actions
+    # バージョン無視設定の正しい書式
+    ignore:
+      - dependency-name: "py-serializable"
+        versions:
+          - ">=2.0.0,<3.0.0"      # ← SemVer 範囲指定
+
+  # ---------------- GitHub Actions ----------------
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
