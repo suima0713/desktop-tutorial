@@ -1,6 +1,7 @@
 # desktop‑tutorial
 
-[![CI smoke](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-smoke.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-smoke.yml)
+[![coverage](./coverage.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml)
+
 
 > **GitHub Desktop チュートリアル用リポジトリ**
 > クロスプラットフォーム（Windows / macOS / Linux）で動く `build.ps1` を題材に、
