@@ -23,3 +23,6 @@ __pycache__/
 
 __pycache__/
 *.pyc
+
+# Scratch project used in tutorials
+desktop-tutorial/
