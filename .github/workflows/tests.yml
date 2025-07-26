@@ -54,7 +54,6 @@ jobs:
         run: |
           coverage combine || true
 
-
       # 6) バッジ用ディレクトリ確保
       - name: Ensure badges directory exists
         if: >
