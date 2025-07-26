@@ -1,13 +1,28 @@
 # Virtual environment
 .smoke/
+.venv/
+env/
+venv/
 
 # Coverage reports
+.pytest_cache/
 .coverage
 coverage.xml
 
 # Build artifacts
 dist/
 *.egg-info/
+__pycache__/
+*.py[cod]
+*.pyo
 
 # IDE / Editor
 .vscode/
+.idea/
+*.pyc
+
+__pycache__/
+*.pyc
+
+# Scratch project used in tutorials
+desktop-tutorial/

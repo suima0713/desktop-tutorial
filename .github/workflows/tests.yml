@@ -1,0 +1,99 @@
+name: Tests & Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # ① バッジ commit 用。job‑level に限定
+
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      # ───────────────────────────────
+      # 1) Checkout（完全履歴）
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2) Python セットアップ + pip cache
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt  # ② ハッシュキーに反映
+
+      # 3) 依存インストール
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      # ───────────────────────────────
+      # 4) テスト実行 + カバレッジ
+      - name: Run tests with coverage
+        run: |
+          pytest -q --tb=short \
+                 --cov=. \
+                 --cov-report=xml \
+                 --cov-report=html:htmlcov \
+                 --cov-fail-under=5          # 5 % 未満で fail
+
+      # ───────────────────────────────
+      # 5) カバレッジ準備（main push & Py3.11）
+      - name: Combine coverage (optional)
+        if: matrix.python-version == '3.11'
+        run: |
+          coverage combine || true
+
+      # 6) バッジ用ディレクトリ確保
+      - name: Ensure badges directory exists
+        if: >
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
+        run: mkdir -p badges
+
+      # 7) カバレッジバッジ生成
+      - name: Generate coverage badge
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          matrix.python-version == '3.11'
+        uses: tj-actions/coverage-badge-py@v2
+        with:
+          output: coverage.svg
+          overwrite: true
+
+      # 8) バッジコミット
+      - name: Commit badge
+        if: |
+          github.ref == 'refs/heads/main' &&
+          github.event_name == 'push' &&
+          matrix.python-version == '3.11'
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: coverage.svg
+          message: 'chore: update coverage badge'
+          default_author: github_actions
+
+      # 9) HTML レポートをアーカイブ & アップロード
+      - name: Archive HTML coverage report
+        if: hashFiles('htmlcov/index.html') != ''
+        run: tar -czf htmlcov.tgz htmlcov
+
+      - name: Upload coverage artifact
+        if: success() && hashFiles('htmlcov/index.html') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-${{ matrix.python-version }}
+          path: htmlcov.tgz
+          retention-days: 7

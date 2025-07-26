@@ -1,0 +1,20 @@
+name: artifact‑debug
+on: workflow_dispatch          # 手動実行だけ
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create dummy coverage file
+        run: |
+          echo "dummy" > .coverage.1
+          ls -alh
+
+      - name: Upload dummy artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage
+          path: |
+            .coverage.1               # 1 行目：ルート直下
+            **/.coverage.1            # 2 行目：サブ階層対策
+          if-no-files-found: error

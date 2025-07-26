@@ -1,0 +1,17 @@
+# --- testing ---
+pytest
+pytest-split==0.10.0
+pytest-cov>=4.1.0
+
+# --- lint/format ---
+ruff>=0.4
+black>=24.4
+isort>=5.13
+
+# --- type check ---
+mypy>=1.10
+types-requests   # ← サードパーティ stub が必要なら
+
+# --- automation ---
+pre-commit>=3.7
+tox>=4.15

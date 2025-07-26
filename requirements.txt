@@ -4,10 +4,9 @@ certifi==2025.7.14
 cfgv==3.4.0
 charset-normalizer==3.4.2
 colorama==0.4.6
-coverage==7.9.2
+coverage==7.10.0
 cyclonedx-python-lib==9.1.0
 defusedxml==0.7.1
--e git+https://github.com/suima0713/desktop-tutorial.git@322d56a2a74a65af9e72e559b71c2726d7f34b43#egg=desktop_tutorial
 distlib==0.3.9
 filelock==3.18.0
 identify==2.6.12
@@ -36,9 +35,9 @@ pytest==8.4.1
 pytest-cov==6.2.1
 PyYAML==6.0.2
 requests==2.32.4
-rich==14.0.0
+rich==14.1.0
 sortedcontainers==2.4.0
 toml==0.10.2
 typing_extensions==4.14.1
 urllib3==2.5.0
-virtualenv==20.31.2
+virtualenv==20.32.0
