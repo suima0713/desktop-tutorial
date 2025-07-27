@@ -1,30 +1,40 @@
 repos:
-  # ---------- General housekeeping hooks ----------
+  # ---------- General housekeeping ----------
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
-      - id: end-of-file-fixer          # 改行の欠落を修正
-        stages: [pre-commit]           # ← commit 時のみ実行
-      - id: trailing-whitespace        # 行末スペース除去
+      - id: end-of-file-fixer
         stages: [pre-commit]
+      - id: trailing-whitespace
+        stages: [pre-commit]
+      - id: check-merge-conflict
 
-  # ---------- Code formatters / linters ----------
+  # ---------- Code formatter ----------
   - repo: https://github.com/psf/black
-    rev: 24.3.0
+    rev: 24.4.2
     hooks:
       - id: black
 
+  # ---------- Linter ----------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.0
+    rev: v0.4.4
     hooks:
       - id: ruff
-        # `args` を複数行書く場合は YAML リストにする
         args:
           - --fix
-          - --exit-zero        # lint だけで失敗させたくない場合
+          - --exit-zero        # lint だけで失敗させない
+        stages: [pre-commit]
 
-  # ---------- Git hygiene ----------
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+  # ---------- YAML linter ----------
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
     hooks:
-      - id: check-merge-conflict
+      - id: yamllint
+        args:
+          - -d
+          - >
+            {extends: default,
+             rules: {
+               truthy: disable,
+               line-length: {max: 120, allow-non-breakable-words: true}
+             }}
