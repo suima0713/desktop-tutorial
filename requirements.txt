@@ -1,7 +1,7 @@
 aiohappyeyeballs==2.6.1
 aiohttp==3.12.14
 aiosignal==1.4.0
-alpha_vantage==3.0.0
+alpha_vantage==2.3.1
 attrs==25.3.0
 beautifulsoup4==4.13.4
 black==25.1.0
@@ -43,12 +43,12 @@ protobuf==6.31.1
 pycparser==2.22
 Pygments==2.19.2
 pyproject-api==1.9.1
-pytest==8.4.1
+pytest==8.2.1
 pytest-cov==6.2.1
 pytest-split==0.10.0
 pytest-vcr==1.0.2
 python-dateutil==2.9.0.post0
-python-dotenv==1.1.1
+python-dotenv==1.0.1
 pytz==2025.2
 PyYAML==6.0.2
 requests==2.32.4
