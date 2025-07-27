@@ -32,7 +32,6 @@ mypy_extensions==1.1.0
 nodeenv==1.9.1
 numpy==2.3.2
 packaging==25.0
-pandas==2.3.1
 pathspec==0.12.1
 peewee==3.18.2
 platformdirs==4.3.8
@@ -67,3 +66,4 @@ wrapt==1.17.2
 yamllint==1.37.1
 yarl==1.20.1
 yfinance==0.2.65
+pandas>=1.5
