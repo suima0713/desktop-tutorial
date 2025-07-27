@@ -46,4 +46,9 @@ coverage.svg
 .tox/
 .venv/
 *.egg-info/
+__pycache__/
+.venv/
+.coverage
+coverage.svg
 '@ | Add-Content .gitignore
+coverage.svg
