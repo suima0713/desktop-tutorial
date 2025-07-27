@@ -29,3 +29,21 @@ __pycache__/
 
 # Scratch project used in tutorials
 desktop-tutorial/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+*.egg-info/
+.smoke/
+.coverage
+coverage.svg
+
+@'
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.smoke/
+.tox/
+.venv/
+*.egg-info/
+'@ | Add-Content .gitignore
