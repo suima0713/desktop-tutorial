@@ -4,6 +4,9 @@
 env/
 venv/
 
+# Local data cache (finance API snapshots, etc.)
+.cache/
+
 # Coverage reports
 .pytest_cache/
 .coverage
