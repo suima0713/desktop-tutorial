@@ -1,7 +1,12 @@
 # desktop‑tutorial
 
-[![coverage](./coverage.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml)
+[![Coverage](https://codecov.io/gh/<user>/<repo>/branch/main/graph/badge.svg)](https://app.codecov.io/gh/<user>/<repo>)
 
+## Quick Overview
+
+**Use case** Fetch AAPL / MSFT daily closes & quarterly balance sheets, then paste to research notes.
+**Setup** `python -m venv .venv && pip install -r requirements-dev.txt`
+**Cost** Works entirely with free‑tier APIs (Yahoo Finance, Alpha Vantage, FRED).
 
 > **GitHub Desktop チュートリアル用リポジトリ**
 > クロスプラットフォーム（Windows / macOS / Linux）で動く `build.ps1` を題材に、
