@@ -1,28 +1,38 @@
-# Virtual environment
-.smoke/
+############################################################
+#  Python virtual environments
+############################################################
 .venv/
-env/
-venv/
+.venv-/
+.venv-1/
 
-# Local data cache (finance API snapshots, etc.)
+############################################################
+# Caches / local data
+############################################################
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.smoke/
 .cache/
 
-# Coverage reports
-.pytest_cache/
-.coverage
-coverage.xml
-
-# Build artifacts
-dist/
+############################################################
+# Build / coverage / artifacts
+############################################################
 *.egg-info/
-__pycache__/
+dist/
+build/
+.tox/
+.coverage
+coverage.*
 *.py[cod]
 *.pyo
+*.pyd
+coverage.svg
 
-# IDE / Editor
+############################################################
+# IDE / editor
+############################################################
 .vscode/
 .idea/
-*.pyc
 
 __pycache__/
 *.pyc
@@ -52,3 +62,9 @@ __pycache__/
 coverage.svg
 '@ | Add-Content .gitignore
 coverage.svg
+=======
+############################################################
+# Deprecated legacy files
+############################################################
+requirements-lock.txt
+>>>>>>> d8eed0f (chore: ignore venv, add dependency sources & locks)
