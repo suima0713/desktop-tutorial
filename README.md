@@ -38,3 +38,6 @@ cd desktop-tutorial
 ## ✨ すぐに試す（ユースケース例）
 ```bash
 poetry run python -m mypkg.cli price --symbol AAPL
+
+## 4. 現状ステータス
+BaseProvider 骨格　✅ 完了
