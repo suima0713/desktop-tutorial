@@ -1,6 +1,6 @@
 # desktop‑tutorial
 
-[![coverage](./coverage.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml)
+[![Coverage](https://codecov.io/gh/<user>/<repo>/branch/main/graph/badge.svg)](https://app.codecov.io/gh/<user>/<repo>)
 
 
 > **GitHub Desktop チュートリアル用リポジトリ**
