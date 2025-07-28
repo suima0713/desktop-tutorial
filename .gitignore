@@ -68,3 +68,8 @@ coverage.svg
 ############################################################
 requirements-lock.txt
 >>>>>>> d8eed0f (chore: ignore venv, add dependency sources & locks)
+
+# local env/linter cache
+/.venv*
+/.ruff_cache/
+*.egg-info/
