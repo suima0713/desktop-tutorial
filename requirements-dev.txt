@@ -32,6 +32,8 @@ colorama==0.4.6
     # via
     #   click
     #   pytest
+coverage[toml]==7.10.1
+    # via pytest-cov
 curl-cffi==0.12.0
     # via yfinance
 fmp-python==0.1.5
@@ -93,7 +95,10 @@ pycparser==2.22
 pytest==8.2.1
     # via
     #   -r requirements-dev.in
+    #   pytest-cov
     #   pytest-vcr
+pytest-cov==4.1.0
+    # via -r requirements-dev.in
 pytest-vcr==1.0.2
     # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
