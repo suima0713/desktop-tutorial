@@ -1,5 +1,5 @@
 import pytest
-from desktop_tutorial.providers.yahoo import YahooProvider
+from mypkg.providers.yahoo import YahooProvider
 
 
 @pytest.mark.e2e
