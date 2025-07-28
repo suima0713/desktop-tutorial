@@ -11,13 +11,13 @@ repos:
 
   # ---------- Code formatter ----------
   - repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 25.1.0
     hooks:
       - id: black
 
   # ---------- Linter ----------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.12.5
     hooks:
       - id: ruff
         args:
