@@ -35,6 +35,13 @@ jobs:
           pip install -r requirements-dev.txt
           pip install "pyarrow>=16,<17"
 
+      # ------------------------------------------------------------
+      # Install project (src 配置の場合は . ではなく ./src ではなく
+      # setup.cfg/pyproject.toml に package 情報があるのでこれで OK)
+      # ------------------------------------------------------------
+      - name: Install project in editable mode
+        run: pip install -e .
+
       # --- ここでテストとカバレッジ XML を生成 ---
       - name: Run tests
         run: |
