@@ -9,3 +9,9 @@ requires-python = ">=3.11"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.poetry.dependencies]
+pyarrow = ">=16,<17"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"

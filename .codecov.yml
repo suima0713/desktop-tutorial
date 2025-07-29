@@ -1,0 +1,13 @@
+coverage:
+  ignore:
+    # ───────────────────────
+    # ❶ tests 以下を完全に除外
+    #    ** = 再帰ワイルドカード
+    # ───────────────────────
+    - "tests/**"
+
+  status:
+    patch:
+      default:
+        target: 70 # 目標
+        threshold: 5 # ±許容差
