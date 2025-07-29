@@ -1,0 +1,6 @@
+coverage:
+  status:
+    patch:
+      default:
+        target: 70 # 70%以上で OK
+        threshold: 5 # ±5% は許容
