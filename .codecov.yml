@@ -1,6 +1,8 @@
 coverage:
+  ignore:
+    - "tests/*" # patch / project どちらも無視
   status:
     patch:
       default:
         target: 70 # 70%以上で OK
-        threshold: 5 # ±5% は許容
+        threshold: 5
