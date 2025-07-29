@@ -33,9 +33,7 @@ jobs:
       - name: Install dev deps
         run: |
           pip install -r requirements-dev.txt
-          pip install "pyarrow>=16,<17"          # 追加 ←
-      - name: Install package
-        run: pip install -e .
+          pip install "pyarrow>=16,<17"
 
       # --- ここでテストとカバレッジ XML を生成 ---
       - name: Run tests
