@@ -1,6 +1,11 @@
 # desktop‑tutorial
 
-[![Coverage](https://codecov.io/gh/<user>/<repo>/branch/main/graph/badge.svg)](https://app.codecov.io/gh/<user>/<repo>)
+[![CI](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci.yml)
+[![Release](https://github.com/suima0713/desktop-tutorial/actions/workflows/release.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/release.yml)
+[![Coverage](https://codecov.io/gh/suima0713/desktop-tutorial/branch/main/graph/badge.svg)](https://codecov.io/gh/suima0713/desktop-tutorial)
+
+<!-- PyPI は公開後に有効化 -->
+<!-- [![PyPI](https://img.shields.io/pypi/v/desktop-tutorial.svg)](https://pypi.org/project/desktop-tutorial/) -->
 
 ## Quick Overview
 
