@@ -1,22 +1,35 @@
 [tool.poetry]
 name        = "desktop-tutorial"
-version     = "0.1.0"
-description = ""
-authors     = ["Your Name <you@example.com>"]
+version     = "0.1.2"                         # ★ タグと同期
+description = "Sample desktop tutorial: fetch market data and run DCF analyses"
+authors     = ["Naoto Suima <you@example.com>"]
+license     = "MIT"
+readme      = "README.md"
 
-# --- ここがパッケージ宣言 ---
+# Project links (PyPI UI 左サイドバー)
+homepage      = "https://github.com/suima0713/desktop-tutorial"
+repository    = "https://github.com/suima0713/desktop-tutorial"
+documentation = "https://github.com/suima0713/desktop-tutorial#readme"
+
+keywords = ["finance", "yahoo-finance", "tutorial"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
 packages = [
   { include = "desktop_tutorial", from = "src" }
 ]
 
 [tool.poetry.dependencies]
-python  = ">=3.11,<4.0"
-pyarrow = "^16"
-yfinance = {version = "^0.2.65", extras = ["rapidjson"]}
+python   = ">=3.11,<4.0"
+pyarrow  = "^16"
+yfinance = { version = "^0.2.65", extras = ["rapidjson"] }
 
 [tool.poetry.group.dev.dependencies]
-black   = "^25.1.0"
-pytest  = "^8.2"
+black  = "^25.1.0"
+pytest = "^8.2"
 
 [build-system]
 requires      = ["poetry-core"]
