@@ -9,5 +9,5 @@ coverage:
   status:
     patch:
       default:
-        target: 70 # 目標
-        threshold: 5 # ±許容差
+        target: 80 # 目標
+        threshold: 2 # ±許容差
