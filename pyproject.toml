@@ -1,17 +1,23 @@
-[build-system]
-requires = ["setuptools>=61", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.poetry]
+name        = "desktop-tutorial"
+version     = "0.1.0"
+description = ""
+authors     = ["Your Name <you@example.com>"]
 
-[project]
-name = "desktop-tutorial"
-version = "0.1.0"
-requires-python = ">=3.11"
-
-[tool.setuptools.packages.find]
-where = ["src"]
+# --- ここがパッケージ宣言 ---
+packages = [
+  { include = "desktop_tutorial", from = "src" }
+]
 
 [tool.poetry.dependencies]
-pyarrow = ">=16,<17"
+python  = ">=3.11,<4.0"
+pyarrow = "^16"
+yfinance = {version = "^0.2.65", extras = ["rapidjson"]}
 
 [tool.poetry.group.dev.dependencies]
-black = "^25.1.0"
+black   = "^25.1.0"
+pytest  = "^8.2"
+
+[build-system]
+requires      = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

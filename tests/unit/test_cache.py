@@ -1,7 +1,7 @@
 import importlib
 import pandas as pd
 import pytest
-from mypkg import cache
+from desktop_tutorial import cache
 
 
 def _df():
@@ -10,7 +10,7 @@ def _df():
 
 # -------- round‑trip --------
 def test_roundtrip_parquet(tmp_path, monkeypatch):
-    monkeypatch.setenv("MYPKG_CACHE_DIR", str(tmp_path))
+    monkeypatch.setenv("DESKTOP_TUTORIAL_CACHE_DIR", str(tmp_path))
     cache._CACHE_DIR = tmp_path  # ❶ キャッシュ先を上書き
     df = _df()
     fp = cache.write(df, symbol="TEST", start=None, end=None, freq="1d", fmt="parquet")
@@ -20,7 +20,7 @@ def test_roundtrip_parquet(tmp_path, monkeypatch):
 
 
 def test_roundtrip_csv(tmp_path, monkeypatch):
-    monkeypatch.setenv("MYPKG_CACHE_DIR", str(tmp_path))
+    monkeypatch.setenv("DESKTOP_TUTORIAL_CACHE_DIR", str(tmp_path))
     cache._CACHE_DIR = tmp_path
     df = _df()
     fp = cache.write(df, symbol="CSV", start=None, end=None, freq="1d", fmt="csv")
@@ -31,7 +31,7 @@ def test_roundtrip_csv(tmp_path, monkeypatch):
 
 # -------- 異常系 --------
 def test_cache_unsupported_fmt(tmp_path, monkeypatch):
-    monkeypatch.setenv("MYPKG_CACHE_DIR", str(tmp_path))
+    monkeypatch.setenv("DESKTOP_TUTORIAL_CACHE_DIR", str(tmp_path))
     cache._CACHE_DIR = tmp_path
     df = _df()
     with pytest.raises(ValueError, match="Unsupported fmt"):
@@ -40,9 +40,9 @@ def test_cache_unsupported_fmt(tmp_path, monkeypatch):
 
 # -------- 内部ヘルパー --------
 def test_path_and_key(monkeypatch, tmp_path):
-    monkeypatch.setenv("MYPKG_CACHE_DIR", str(tmp_path))
+    monkeypatch.setenv("DESKTOP_TUTORIAL_CACHE_DIR", str(tmp_path))
     importlib.reload(cache)  # ❷ 環境変数を反映させる
-    from mypkg.cache import _hash_key, _path
+    from desktop_tutorial.cache import _hash_key, _path
 
     key = _hash_key(symbol="ABC", start=None, end=None, freq="1d")
     fp = _path(key, fmt="csv")
@@ -53,7 +53,7 @@ def test_path_and_key(monkeypatch, tmp_path):
 @pytest.mark.parametrize("fmt", ["parquet", "csv"])
 def test_write_read_both_fmt(tmp_path, monkeypatch, fmt):
     """write → read の両フォーマットを網羅 (分岐カバー)"""
-    monkeypatch.setenv("MYPKG_CACHE_DIR", str(tmp_path))
+    monkeypatch.setenv("DESKTOP_TUTORIAL_CACHE_DIR", str(tmp_path))
     cache._CACHE_DIR = tmp_path
     df = _df()
     fp = cache.write(df, symbol="BOTH", start=None, end=None, freq="1d", fmt=fmt)

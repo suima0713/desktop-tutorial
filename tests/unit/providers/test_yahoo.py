@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from mypkg.providers.yahoo import YahooProvider
+from desktop_tutorial.providers.yahoo import YahooProvider
 
 
 @pytest.mark.e2e
