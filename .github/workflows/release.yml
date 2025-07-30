@@ -42,3 +42,8 @@ jobs:
           files: |
             dist/*.whl
             dist/*.tar.gz
+
+      - name: Debug Secret (masked)      # ← 2スペース or 4スペース
+        run: echo "Length ..."
+        env:                             # ← 同じインデント
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}   # ← 2スペース深く
