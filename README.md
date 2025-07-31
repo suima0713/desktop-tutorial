@@ -1,8 +1,8 @@
 # desktop‑tutorial
 
-[![CI](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci.yml)
-[![Release](https://github.com/suima0713/desktop-tutorial/actions/workflows/release.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/release.yml)
-[![Coverage](https://codecov.io/gh/suima0713/desktop-tutorial/branch/main/graph/badge.svg)](https://codecov.io/gh/suima0713/desktop-tutorial)
+[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+[![Release](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml)
+[![codecov](https://codecov.io/gh/<OWNER>/<REPO>/branch/main/graph/badge.svg)](https://codecov.io/gh/<OWNER>/<REPO>)
 
 <!-- PyPI は公開後に有効化 -->
 <!-- [![PyPI](https://img.shields.io/pypi/v/desktop-tutorial.svg)](https://pypi.org/project/desktop-tutorial/) -->
