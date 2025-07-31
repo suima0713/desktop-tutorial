@@ -30,6 +30,7 @@ yfinance = { version = "^0.2.65", extras = ["rapidjson"] }
 [tool.poetry.group.dev.dependencies]
 black  = "^25.1.0"
 pytest = "^8.2"
+pytest-cov = "^6.2.1"
 
 [build-system]
 requires      = ["poetry-core"]

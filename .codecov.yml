@@ -1,13 +1,11 @@
 coverage:
-  ignore:
-    # ───────────────────────
-    # ❶ tests 以下を完全に除外
-    #    ** = 再帰ワイルドカード
-    # ───────────────────────
-    - "tests/**"
-
   status:
-    patch:
+    project: # リポジトリ全体
       default:
-        target: 80 # 目標
-        threshold: 2 # ±許容差
+        target: 80 # 目標 80%
+        threshold: 2 # ±2% までは CI pass
+    patch: # PR 単位
+      default:
+        target: 80
+comment:
+  layout: "reach, diff, files"

@@ -31,5 +31,18 @@ jobs:
       - name: Install project (editable) & dev-deps
         run: poetry install --no-interaction --with dev
 
-      - name: Run tests
-        run: poetry run pytest -q
+      - name: Run tests with coverage
+        run: |
+          poetry run pytest \
+            --cov=desktop_tutorial \
+            --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          # public リポジトリなら token 省略可
+          # token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml          # 明示推奨
+          flags: unittests             # optional：ジョブ識別用タグ
+          name: python-${{ matrix.os }}-py${{ matrix.python-version }}
+          fail_ci_if_error: true       # アップロード失敗でジョブを失敗扱いに
