@@ -11,6 +11,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: release    # ← ★追加★  (PendingPublisher の Env と同じ文字列)
+
     steps:
       - uses: actions/checkout@v4
 
