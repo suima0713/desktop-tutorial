@@ -1,6 +1,6 @@
 [tool.poetry]
 name        = "desktop-tutorial"
-version     = "0.1.10"                         # ★ タグと同期
+version     = "0.1.11"                         # ★ タグと同期
 description = "Sample desktop tutorial: fetch market data and run DCF analyses"
 authors     = ["Naoto Suima <you@example.com>"]
 license     = "MIT"
