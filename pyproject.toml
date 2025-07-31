@@ -34,3 +34,13 @@ pytest = "^8.2"
 [build-system]
 requires      = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name     = "pypi-main"
+url      = "https://pypi.org/simple"
+priority = "primary"          # まず本番 PyPI で解決
+
+[[tool.poetry.source]]
+name     = "testpypi"
+url      = "https://test.pypi.org/simple"
+priority = "supplemental"     # 開発パッケージのみこちらで上書き
