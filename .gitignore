@@ -4,6 +4,9 @@
 .venv/
 .venv-/
 .venv-1/
+venv*/
+**/venv*/
+.env*/
 
 ############################################################
 # Caches / local data
@@ -54,10 +57,8 @@ coverage.svg
 .ruff_cache/
 .smoke/
 .tox/
-.venv/
 *.egg-info/
 __pycache__/
-.venv/
 .coverage
 coverage.svg
 '@ | Add-Content .gitignore
