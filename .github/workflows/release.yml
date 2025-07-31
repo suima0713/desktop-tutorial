@@ -1,38 +1,35 @@
+# .github/workflows/release.yml
 name: Release
-
 on:
   push:
-    tags:
-      - "v*.*.*"      # 例: v0.1.3
+    tags: ['v*']
 
 permissions:
-  contents: write     # GitHub Release の作成に必要
-  id-token: write     # ★ OIDC 認証に必須
+  id-token: write   # ← OIDC で必須
+  contents: write   # Release を作る場合だけ
 
 jobs:
   publish:
-    environment: release
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install Poetry
-        run: pip install poetry
+        run: pip install poetry==2.1.3
 
       - name: Build package
         run: poetry build
 
-      - name: Publish to TestPyPI             # ← TOKEN 行は削除
+      - name: Publish to TestPyPI   # ← password は不要
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-          packages-dir: dist                 # password: 行は不要
+          # password:  行を削除！
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
