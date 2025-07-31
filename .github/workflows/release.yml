@@ -7,10 +7,11 @@ on:
 
 permissions:
   contents: write     # GitHub Release の作成に必要
-  id-token: write     # （将来）PyPI Trusted Publishing 用
+  id-token: write     # ★ OIDC 認証に必須
 
 jobs:
   publish:
+    environment: release
     runs-on: ubuntu-latest
 
     steps:
@@ -27,13 +28,11 @@ jobs:
       - name: Build package
         run: poetry build
 
-      - name: Publish to TestPyPI
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish to TestPyPI             # ← TOKEN 行は削除
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          packages-dir: dist
+          packages-dir: dist                 # password: 行は不要
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
