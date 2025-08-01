@@ -1,3 +1,4 @@
+# ↓↓↓ これが正しい最小構成（permissions は 1 回だけ!!） ↓↓↓
 # .github/workflows/ci-tests.yml  ※ permissions は1回だけ
 ---                       # ← 追加
 name: CI Tests
@@ -7,6 +8,10 @@ on:
   push:
     branches: [main]
 
+permissions:               # ここだけ
+  contents: write
+  statuses: write
+  id-token: write          # OIDC 用（あっても害はない）
 permissions:            # ★ココを1回だけ書く
   contents: write
   statuses: write
@@ -22,6 +27,8 @@ permissions:          # ★ここ
 jobs:
   tests:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,6 +48,10 @@ jobs:
           pip install --upgrade pip
           pip install poetry
 
+      - name: Install deps (default+dev)
+        run: |
+          poetry install --with dev --no-interaction --no-root --sync
+          
       - name: Install deps (default + dev)
         run: |
           poetry install --with dev --no-interaction --no-root --sync
@@ -52,6 +63,8 @@ jobs:
       - name: Run tests
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
+
+      - name: Upload coverage to Codecov       # 任意（落としても CI は成功にしたいなら skip-ok など）
 
 
       # ── DEBUG: シークレット確認 ──
