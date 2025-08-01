@@ -1,11 +1,37 @@
 coverage:
-  status:
-    project: # リポジトリ全体
+  status: # ❶ しきい値ルール
+    project: #    リポジトリ全体
       default:
-        target: 80 # 目標 80%
-        threshold: 2 # ±2% までは CI pass
-    patch: # PR 単位
+        # ⬇ 目標値（%）。80 % 未満で失敗
+        target: 80
+        # ⬇ 前回比の許容変動。ここでは ‑2 pt までは pass
+        threshold: "2%"
+        # ⬇ ブランチ限定で適用したい場合は例: only_pulls: true
+    patch: #    PR 単位（差分コード）
       default:
         target: 80
-comment:
-  layout: "reach, diff, files"
+
+comment: # ❷ PR コメントのレイアウト
+  layout: "reach, diff, files" #    reach=全体%, diff=差分%, files=ファイル別
+  behavior: default #    同じ PR では最新 1 件だけ残す
+  require_changes: false #    変化なしでもコメントを投稿
+
+github_checks: # ❸ GitHub Checks に summary 出力
+  annotations: true #    行レベルで可視化
+
+# ❹ アップロード調整（複数 CI で重複アップ時に使う）
+# codecov:
+#   disable_default_path_fixes: false
+#   allow_coverage_offsets: true
+#   max_report_age: 28
+
+# ❺ ファイルやフォルダ毎のグループ化例（任意）
+# parsers:
+#   gcov:
+#     branch_detection:
+#       mode: regex
+
+# ignore:                         # ❻ カバレッジ計算から除外したいパス
+#   - "tests/**/*"
+#   - "src/*/__init__.py"
+## ───────────────────────────────────────────────────────
