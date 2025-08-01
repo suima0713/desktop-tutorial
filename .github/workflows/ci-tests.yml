@@ -2,9 +2,8 @@
 name: CI Tests
 
 on:
-  push:
-    branches: [main]      # ← “[ main ]” ではなく “[main]”
   pull_request:
+  push:
     branches: [main]
 
 permissions:          # ★ここ
