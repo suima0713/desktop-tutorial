@@ -1,3 +1,4 @@
+# .github/workflows/ci-tests.yml  ※ permissions は1回だけ
 ---                       # ← 追加
 name: CI Tests
 
@@ -6,6 +7,10 @@ on:
   push:
     branches: [main]
 
+permissions:            # ★ココを1回だけ書く
+  contents: write
+  statuses: write
+  id-token: write        # （tokenlessでもあった方が無難）
 permissions:            # ★ GitHub App 経由の Codecov (tokenless) に必須
   contents: write
   statuses: write
@@ -17,6 +22,10 @@ permissions:          # ★ここ
 jobs:
   tests:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +52,7 @@ jobs:
       - name: Run tests
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
+
 
       # ── DEBUG: シークレット確認 ──
       - name: DEBUG show token existence
