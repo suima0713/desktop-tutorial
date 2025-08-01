@@ -2,10 +2,13 @@
 name: CI Tests
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+    branches:
+      - main
+
+permissions:
+  contents: write        # ←★ 追加
+  pull-requests: write   # ←★ 追加
 
 jobs:
   tests:
@@ -42,6 +45,6 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # ★追加
-          slug: suima0713/desktop-tutorial     # 明示しておくと誤検出しない
-          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}      # ★必須（保護ブランチ）
+          flags: unittests                         # 任意
+          fail_ci_if_error: true                   # アップロード失敗で CI 落とす
