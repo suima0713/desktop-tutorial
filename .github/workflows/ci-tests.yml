@@ -7,8 +7,8 @@ on:
   pull_request:
     branches: [main]
 
-permissions:                     # ★ここを追加
-  contents: read                 # デフォルト
+permissions:          # ★ここ
+  contents: write      # ← 追加
   statuses: write                # ← これが無いと tokenless で 401
 
 jobs:
