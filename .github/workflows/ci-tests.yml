@@ -44,3 +44,5 @@ jobs:
         with:
           flags: unittests
           fail_ci_if_error: true
+      - name: DEBUG – show whether CODECOV_TOKEN is set
+        run: echo "TOKEN_EXISTS=${{ secrets.CODECOV_TOKEN != '' }}"
