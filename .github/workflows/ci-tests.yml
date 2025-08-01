@@ -7,9 +7,9 @@ on:
   pull_request:
     branches: [main]
 
-permissions:              # ← 追加
-  contents: write         #   コミット作成に必要
-  id-token: write         #   OIDC 経由アップロードで必要
+permissions:                     # ★ここを追加
+  contents: read                 # デフォルト
+  statuses: write                # ← これが無いと tokenless で 401
 
 jobs:
   tests:
@@ -30,6 +30,11 @@ jobs:
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
 
+      # ── DEBUG: シークレット確認 ──
+      - name: DEBUG show token existence
+        run: echo "TOKEN_EXISTS=${{ secrets.CODECOV_TOKEN != '' }}"
+
+      # ── Codecov アップロード ──
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
