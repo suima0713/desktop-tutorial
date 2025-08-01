@@ -6,6 +6,10 @@ on:
   push:
     branches: [main]
 
+permissions:            # ★ GitHub App 経由の Codecov (tokenless) に必須
+  contents: write
+  statuses: write
+  id-token: write       # codecov‑action@v4 が OIDC を使う場合に備え推奨
 permissions:          # ★ここ
   contents: write      # ← 追加
   statuses: write                # ← これが無いと tokenless で 401
@@ -16,10 +20,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # 差分判定に履歴が必要な場合
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
+      - name: Install deps (default + dev)
+        run: |
+          poetry install --with dev --no-interaction --no-root --sync
       - name: Install deps
         run: |
           pip install poetry
@@ -37,5 +52,5 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          flags: unittests
-          fail_ci_if_error: true
+          flags: unittests          # 任意タグ
+          fail_ci_if_error: true    # アップロード失敗でジョブを落とす
