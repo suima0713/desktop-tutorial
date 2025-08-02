@@ -2,8 +2,9 @@
 name: CI Tests
 
 on:
+  workflow_dispatch: # ← 追加（GUI から手動実行できる）
   push:
-    branches: [main]
+    branches: ["**"]
   pull_request:
 
 permissions:
