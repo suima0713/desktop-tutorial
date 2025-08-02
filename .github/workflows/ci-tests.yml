@@ -1,10 +1,19 @@
+# .github/workflows/ci-tests.yml   ← 新規に貼り付け
 # ↓↓↓ これが正しい最小構成（permissions は 1 回だけ!!） ↓↓↓
 # .github/workflows/ci-tests.yml  ※ permissions は1回だけ
 ---                       # ← 追加
 name: CI Tests
 
 on:
+  workflow_dispatch: # ← 追加（GUI から手動実行できる）
   push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read       # ← 追加
+  statuses: write      # ← 追加
+  id-token: write      # 既存
     branches: [main]        # develop など追加可
   pull_request:
 
@@ -44,6 +53,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+    steps:
+      - uses: actions/checkout@v4
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,6 +77,9 @@ jobs:
           pip install --upgrade pip
           pip install poetry
 
+      - name: Install deps
+        run: |
+          poetry install --with dev --no-interaction --sync
       - name: Install deps (default + dev)
         run: |
           poetry install --with dev --no-interaction --no-root --sync
@@ -81,6 +98,13 @@ jobs:
       - name: Run tests
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
+
+      - name: Upload coverage      # ← ステップ名
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}   # ★ 追記：Secrets からトークンを渡す
+          flags: UnitTests         # 任意のタグ
+          fail_ci_if_error: true   # 失敗時にジョブを落とす
 
 
       - name: Upload coverage to Codecov       # 任意（落としても CI は成功にしたいなら skip-ok など）
