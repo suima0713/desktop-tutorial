@@ -34,8 +34,9 @@ jobs:
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
 
-      - name: Upload coverage
+      - name: Upload coverage      # ← ステップ名
         uses: codecov/codecov-action@v4
         with:
-          flags: unittests
-          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}   # ★ 追記：Secrets からトークンを渡す
+          flags: UnitTests         # 任意のタグ
+          fail_ci_if_error: true   # 失敗時にジョブを落とす
