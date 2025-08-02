@@ -28,7 +28,7 @@ jobs:
 
       - name: Install deps
         run: |
-          poetry install --with dev --no-interaction --no-root --sync
+          poetry install --with dev --no-interaction --sync
 
       - name: Run tests
         run: |
