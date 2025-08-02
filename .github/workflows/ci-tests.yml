@@ -4,6 +4,14 @@
 name: CI Tests
 
 on:
+  push:
+    branches: [main]        # 必要なら develop 等を追加
+  pull_request:
+
+permissions:                # ★ このブロックは 1 回だけ
+  contents: write
+  statuses: write           # tokenless Codecov で必須
+  id-token: write           # OIDC(Codecov v4) 用 – 付けても害なし
   pull_request:
   push:
     branches: [main]
@@ -48,6 +56,9 @@ jobs:
           pip install --upgrade pip
           pip install poetry
 
+      - name: Install deps (default + dev)
+        run: |
+          poetry install --with dev --no-interaction --no-root --sync
       - name: Install deps (default+dev)
         run: |
           poetry install --with dev --no-interaction --no-root --sync
@@ -63,6 +74,7 @@ jobs:
       - name: Run tests
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
+
 
       - name: Upload coverage to Codecov       # 任意（落としても CI は成功にしたいなら skip-ok など）
 
