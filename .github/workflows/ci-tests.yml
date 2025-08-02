@@ -1,21 +1,23 @@
-# ↓↓↓ これが正しい最小構成（permissions は 1 回だけ!!） ↓↓↓
+# .github/workflows/ci-tests.yml
 name: CI Tests
 
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches: [main]        # 必要なら develop 等を追加
+  pull_request:
 
-permissions:               # ここだけ
+permissions:                # ★ このブロックは 1 回だけ
   contents: write
-  statuses: write
-  id-token: write          # OIDC 用（あっても害はない）
+  statuses: write           # tokenless Codecov で必須
+  id-token: write           # OIDC(Codecov v4) 用 – 付けても害なし
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -25,7 +27,7 @@ jobs:
           pip install --upgrade pip
           pip install poetry
 
-      - name: Install deps (default+dev)
+      - name: Install deps (default + dev)
         run: |
           poetry install --with dev --no-interaction --no-root --sync
 
@@ -33,7 +35,7 @@ jobs:
         run: |
           poetry run pytest -q --cov=. --cov-report=xml
 
-      - name: Upload coverage to Codecov       # 任意（落としても CI は成功にしたいなら skip-ok など）
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           flags: unittests
