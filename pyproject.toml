@@ -36,11 +36,9 @@ black       = "^25.1.0"
 pytest      = "^8.2"
 pytest-cov  = "^6.2.1"
 ruff        = "^0.4"                          # Linter (任意)
-black  = "^25.1.0"
 pytest = "^8.2"
 pytest-cov = "^6.2.1"
 pandas = "^2.3.1"
-
 # ────────────── ビルドシステム ──────────────
 [build-system]
 requires      = ["poetry-core"]
