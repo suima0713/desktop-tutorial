@@ -36,3 +36,8 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
           verbose: true
+
+      - name: List workspace (debug)   # ← 一度だけ残して様子を見る
+        if: always()
+        run: |
+          find "$GITHUB_WORKSPACE" -name 'coverage.xml' -print -exec wc -l {} \;
