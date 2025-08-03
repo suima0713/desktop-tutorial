@@ -32,6 +32,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}   # tokenless なら削除
+          slug: suima0713/desktop-tutorial           # ← 追加（アップロード先を本家に固定）
           files: coverage.xml
           flags: unittests
           fail_ci_if_error: true
