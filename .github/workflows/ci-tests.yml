@@ -1,64 +1,16 @@
-# .github/workflows/ci-tests.yml   ← 新規に貼り付け
-# ↓↓↓ これが正しい最小構成（permissions は 1 回だけ!!） ↓↓↓
-# .github/workflows/ci-tests.yml  ※ permissions は1回だけ
----                       # ← 追加
+---
 name: CI Tests
 
 on:
-  workflow_dispatch: # ← 追加（GUI から手動実行できる）
+  workflow_dispatch:
   push:
     branches: ["**"]
   pull_request:
 
 permissions:
-  contents: read       # ← 追加
-  statuses: write      # ← 追加
-  id-token: write      # 既存
-  pull_request:
-
-permissions:
-  contents: read       # ← 追加
-  statuses: write      # ← 追加
-  id-token: write      # 既存
-  pull_request:
-
-permissions:
-  contents: read       # ← 追加
-  statuses: write      # ← 追加
-  id-token: write      # 既存
-    branches: [main]        # develop など追加可
-  pull_request:
-
-permissions:                # ★1 回だけ
-  contents: write
-  statuses: write           # Codecov tokenless 必須
-  id-token: write           # Codecov Action v4 の OIDC 推奨
-    branches: [main]        # 必要なら develop 等を追加
-  pull_request:
-
-permissions:                # ★ このブロックは 1 回だけ
-  contents: write
-  statuses: write           # tokenless Codecov で必須
-  id-token: write           # OIDC(Codecov v4) 用 – 付けても害なし
-  pull_request:
-  push:
-    branches: [main]
-
-permissions:               # ここだけ
-  contents: write
+  contents: read
   statuses: write
-  id-token: write          # OIDC 用（あっても害はない）
-permissions:            # ★ココを1回だけ書く
-  contents: write
-  statuses: write
-  id-token: write        # （tokenlessでもあった方が無難）
-permissions:            # ★ GitHub App 経由の Codecov (tokenless) に必須
-  contents: write
-  statuses: write
-  id-token: write       # codecov‑action@v4 が OIDC を使う場合に備え推奨
-permissions:          # ★ここ
-  contents: write      # ← 追加
-  statuses: write                # ← これが無いと tokenless で 401
+  id-token: write
 
 jobs:
   tests:
@@ -67,92 +19,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-    steps:
-      - uses: actions/checkout@v4
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0          # 差分判定に履歴が必要な場合
-
-      - uses: actions/setup-python@v5
-        with:
           python-version: '3.11'
-
       - name: Install Poetry
         run: |
-          pip install --upgrade pip
+          pip install -U pip
           pip install poetry
-
       - name: Install deps
-        run: |
-          poetry install --with dev --no-interaction --sync
-      - name: Install deps (default + dev)
-        run: |
-          poetry install --with dev --no-interaction --no-root --sync
-      - name: Install deps (default+dev)
-        run: |
-          poetry install --with dev --no-interaction --no-root --sync
-          
-      - name: Install deps (default + dev)
-        run: |
-          poetry install --with dev --no-interaction --no-root --sync
-      - name: Install deps
-        run: |
-          pip install poetry
-          poetry install --only=dev
-
+        run: poetry install --with dev --no-interaction --sync
       - name: Run tests
-        run: |
-          poetry run pytest -q --cov=. --cov-report=xml
-
-      - name: Upload coverage      # ← ステップ名
+        run: poetry run pytest -q --cov=. --cov-report=xml
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # ★ 追記：Secrets からトークンを渡す
-          flags: UnitTests         # 任意のタグ
-          fail_ci_if_error: true   # 失敗時にジョブを落とす
-
-      - name: Upload coverage      # ← ステップ名
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # ★ 追記：Secrets からトークンを渡す
-          flags: UnitTests         # 任意のタグ
-          fail_ci_if_error: true   # 失敗時にジョブを落とす
-
-      - name: Upload coverage      # ← ステップ名
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # ★ 追記：Secrets からトークンを渡す
-          flags: UnitTests         # 任意のタグ
-          fail_ci_if_error: true   # 失敗時にジョブを落とす
-
-
-      - name: Upload coverage to Codecov       # 任意（落としても CI は成功にしたいなら skip-ok など）
-
-
-      # ── DEBUG: シークレット確認 ──
-      - name: DEBUG show token existence
-        run: echo "TOKEN_EXISTS=${{ secrets.CODECOV_TOKEN != '' }}"
-
-      # ── Codecov アップロード ──
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          flags: unittests          # 任意タグ
-          fail_ci_if_error: true    # アップロード失敗でジョブを落とす
+          token: ${{ secrets.CODECOV_TOKEN }}   # tokenless なら削除
+          files: coverage.xml
+          flags: unittests
+          fail_ci_if_error: true

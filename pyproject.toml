@@ -1,43 +1,44 @@
 [tool.poetry]
-name         = "desktop-tutorial"
-version      = "0.1.12"                       # ← タグと同期させる場合はここを更新
-description  = "Sample desktop tutorial: fetch market data and run DCF analyses"
-authors      = ["Naoto Suima <you@example.com>"]
-license      = "MIT"
-readme       = "README.md"
+name        = "desktop-tutorial"
+version     = "0.1.12"                 # ← タグと同期させる場合はここを更新
+description = "Sample desktop tutorial: fetch market data and run DCF analyses"
+authors     = ["Naoto Suima <you@example.com>"]
+license     = "MIT"
+readme      = "README.md"
 
 # PyPI ページに表示されるリンク類（任意）
-homepage      = "https://github.com/suima0713/desktop-tutorial"
-repository    = "https://github.com/suima0713/desktop-tutorial"
-documentation = "https://github.com/suima0713/desktop-tutorial#readme"
+homepage     = "https://github.com/suima-dev/desktop-tutorial"
+repository   = "https://github.com/suima-dev/desktop-tutorial"
+documentation = "https://github.com/suima-dev/desktop-tutorial#readme"
 
-keywords     = ["finance", "yahoo-finance", "tutorial"]
-classifiers  = [
+keywords = ["finance", "yahoo-finance", "tutorial"]
+classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
 
-# ────────────── パッケージ配置 ──────────────
+# --------------- パッケージ配置 ---------------
 packages = [
   { include = "desktop_tutorial", from = "src" }
 ]
 
-# ────────────── ランタイム依存 ──────────────
+# --------------- ランタイム依存 ---------------
 [tool.poetry.dependencies]
-python      = ">=3.11,<4.0"
-pandas      = "^2.3.1"                        # 明示的に依存へ
-pyarrow     = "^16"
-yfinance    = { version = "^0.2.65", extras = ["rapidjson"] }
+python   = ">=3.11,<4.0"
+pandas   = "^2.3.1"                          # 明示的に依存へ
+pyarrow  = "^16"
+yfinance = { version = "^0.2.65", extras = ["rapidjson"] }
 
-# ────────────── 開発 / CI 用ツール ──────────────
+# --------------- 開発 / CI 用ツール ---------------
 [tool.poetry.group.dev.dependencies]
-black       = "^25.1.0"
-pytest      = "^8.2"
-pytest-cov  = "^6.2.1"
-ruff        = "^0.4"                          # Linter (任意)
-pandas = "^2.3.1"
-# ────────────── ビルドシステム ──────────────
+black      = "^25.1.0"
+pytest     = "^8.2"
+pytest-cov = "^6.2.1"
+ruff       = "^0.4"                          # Linter（任意）
+
+# --------------- ビルドシステム ---------------
+yamllint = "^1.37.1"
 [build-system]
 requires      = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
