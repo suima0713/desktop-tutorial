@@ -48,6 +48,9 @@ jobs:
               if "desktop" in dist.project_name.lower():
                   print(dist.project_name, dist.version, dist.location)
           PY
+
+      - name: Export PYTHONPATH (temporary)
+        run: echo "PYTHONPATH=$PYTHONPATH:${{ github.workspace }}/src" >> $GITHUB_ENV
       # ---------- run tests -------------
       - name: Run unit tests + coverage
         run: |
