@@ -30,6 +30,8 @@ coverage.*
 *.pyo
 *.pyd
 coverage.svg
+coverage.xml
+*.coverage.*
 
 ############################################################
 # IDE / editor
@@ -50,6 +52,7 @@ desktop-tutorial/
 .smoke/
 .coverage
 coverage.svg
+debug.log
 
 @'
 .mypy_cache/
