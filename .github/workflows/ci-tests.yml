@@ -28,12 +28,9 @@ jobs:
         run: poetry install --with dev --no-interaction --sync
       - name: Run tests
         run: poetry run pytest -q --cov=. --cov-report=xml
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # tokenless なら削除
-          slug: suima0713/desktop-tutorial           # ← 追加（アップロード先を本家に固定）
-          files: reports/coverage.xml
+          use_oidc: true        # ★ トークンレス用フラグ
           flags: unittests
-          fail_ci_if_error: true
           verbose: true
