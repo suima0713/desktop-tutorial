@@ -46,3 +46,4 @@ repos:
         entry: bash -c 'rm -f coverage.xml debug.log .coverage'
         language: system
         always_run: true
+        stages: [manual] # ← これだけ追加

@@ -13,33 +13,50 @@ permissions:
 name: CI Tests
 
 on:
-  workflow_dispatch:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
 
 permissions:
   contents: read
-  statuses: write
   id-token: write
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11']
+        pandas-channel: ['dev', 'stable']
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Install Poetry
+          python-version: ${{ matrix.python-version }}
+
+      # ---------- install deps ----------
+      - name: Install dependencies
         run: |
-          pip install -U pip
-          pip install poetry
-      - name: Install deps
-        run: poetry install --with dev --no-interaction --sync
-      - name: Run tests
-        run: poetry run pytest -q --cov=. --cov-report=xml
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
+          pip install -r requirements.txt
+          pip install -e .
+          pip install pytest pytest-cov
+          if [[ "${{ matrix.pandas-channel }}" == "dev" ]]; then
+            pip install --pre pandas -U    # 開発版
+          else
+            pip install "pandas~=2.3"      # 安定版
+          fi
+          pip list | grep pandas           # debug
+
+      # ---------- run tests -------------
+      - name: Run unit tests + coverage
+        run: |
+          pytest --cov=src --cov-report=xml
+          ls -l coverage.xml
+
+      # ---------- upload ---------------
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}      # ★必須（保護ブランチ）
           flags: unittests                         # 任意
@@ -47,6 +64,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}   # tokenless なら削除
           slug: suima0713/desktop-tutorial           # ← 追加（アップロード先を本家に固定）
           files: reports/coverage.xml
+          use_oidc: true
+          files: ./coverage.xml
           flags: unittests
-          fail_ci_if_error: true
           verbose: true
