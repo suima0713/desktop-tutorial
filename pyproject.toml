@@ -28,7 +28,7 @@ packages = [
 python = "^3.8"
 pandas   = "^2.3.1"                          # 明示的に依存へ
 pyarrow  = "^16"
-yfinance = { version = "^0.2.65", extras = ["rapidjson"] }
+yfinance = "^0.2.37"
 
 # --------------- 開発 / CI 用ツール ---------------
 [tool.poetry.group.dev.dependencies]
