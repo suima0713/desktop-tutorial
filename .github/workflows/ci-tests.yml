@@ -29,6 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+          pip install pytest pytest-cov
           if [[ "${{ matrix.pandas-channel }}" == "dev" ]]; then
             pip install --pre pandas -U    # 開発版
           else
