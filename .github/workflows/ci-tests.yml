@@ -9,42 +9,44 @@ on:
 permissions:
   contents: write        # ←★ 追加
   pull-requests: write   # ←★ 追加
+---
+name: CI Tests
 
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+  statuses: write
+  id-token: write
 jobs:
   tests:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.12']
-
     steps:
-      # ① リポジトリを取得
       - uses: actions/checkout@v4
-
-      # ② Python をセットアップ
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-
-      # ③ 依存をインストール（dev + pyarrow）
-      - name: Install dev deps
+          python-version: '3.11'
+      - name: Install Poetry
         run: |
-          pip install -r requirements-dev.txt
-          pip install "pyarrow>=16,<17"
-
-      # ④ プロジェクトを editable インストール
-      - name: Install project in editable mode
-        run: pip install -e .
-
-      # ⑤ テスト＋カバレッジ
+          pip install -U pip
+          pip install poetry
+      - name: Install deps
+        run: poetry install --with dev --no-interaction --sync
       - name: Run tests
-        run: |
-          pytest -q -m e2e --cov=. --cov-report=xml
-
-      # ⑥ Codecov へアップロード（任意）
-      - name: Upload coverage to Codecov
+        run: poetry run pytest -q --cov=. --cov-report=xml
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}      # ★必須（保護ブランチ）
           flags: unittests                         # 任意
           fail_ci_if_error: true                   # アップロード失敗で CI 落とす
+          token: ${{ secrets.CODECOV_TOKEN }}   # tokenless なら削除
+          slug: suima0713/desktop-tutorial           # ← 追加（アップロード先を本家に固定）
+          files: reports/coverage.xml
+          flags: unittests
+          fail_ci_if_error: true
+          verbose: true

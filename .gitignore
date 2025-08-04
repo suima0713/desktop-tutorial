@@ -1,35 +1,20 @@
-############################################################
-#  Python virtual environments
-############################################################
-.venv/
-.venv-/
-.venv-1/
-venv*/
-**/venv*/
-.env*/
-
-############################################################
-# Caches / local data
-############################################################
+# ── python build / test artifacts ────────────────
+*.py[cod]           # コンパイル済み
 __pycache__/
-.mypy_cache/
-.pytest_cache/
-.smoke/
-.cache/
-
-############################################################
-# Build / coverage / artifacts
-############################################################
-*.egg-info/
-dist/
-build/
-.tox/
 .coverage
+coverage.xml
+coverage/
+htmlcov/
+.test_durations
+.pytest_cache/
+=======
 coverage.*
 *.py[cod]
 *.pyo
 *.pyd
 coverage.svg
+coverage.xml
+*.coverage.*
 
 ############################################################
 # IDE / editor
@@ -37,9 +22,17 @@ coverage.svg
 .vscode/
 .idea/
 
-__pycache__/
-*.pyc
+# ── logs ────────────────────────────────────────
+debug.log
+*.log
 
+# ── env / virtualenv ────────────────────────────
+.env
+.venv/
+.env.*
+env/
+venv/
+=======
 # Scratch project used in tutorials
 desktop-tutorial/
 .mypy_cache/
@@ -50,31 +43,16 @@ desktop-tutorial/
 .smoke/
 .coverage
 coverage.svg
+debug.log
 
-@'
-.mypy_cache/
-.pytest_cache/
+# ── tooling caches ─────────────────────────────
+.cache/
 .ruff_cache/
-.smoke/
-.tox/
-*.egg-info/
-__pycache__/
-.coverage
-coverage.svg
-'@ | Add-Content .gitignore
-coverage.svg
-=======
-############################################################
-# Deprecated legacy files
-############################################################
-requirements-lock.txt
->>>>>>> d8eed0f (chore: ignore venv, add dependency sources & locks)
 
-# local env/linter cache
-/.venv*
-/.ruff_cache/
-*.egg-info/
+# ── editor / OS files ───────────────────────────
+*.swp
+.DS_Store
+Thumbs.db
 
-# build artefacts
-*.egg-info/
-__pycache__/
+# coverage / reports
+reports/

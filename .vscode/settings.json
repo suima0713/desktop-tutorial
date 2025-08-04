@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/.coverage": true,
+        "**/coverage.xml": true,
+        "**/coverage": true,
+        "**/reports": true
+    }
+}
