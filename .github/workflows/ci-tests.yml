@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.10', '3.11']
-        pandas-channel: ['dev', 'stable']
+        pandas-channel: ['stable', 'dev']
     steps:
       - uses: actions/checkout@v4
 
@@ -29,14 +29,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install -e .
-          pip install pytest pytest-cov
           if [[ "${{ matrix.pandas-channel }}" == "dev" ]]; then
-            pip install --pre pandas -U    # 開発版
+            pip install --pre pandas -U      # 開発版 3.0
           else
-            pip install "pandas~=2.3"      # 安定版
+            pip install "pandas~=2.3"        # 安定版
           fi
-          pip list | grep pandas           # debug
 
       # ---------- run tests -------------
       - name: Run unit tests + coverage
