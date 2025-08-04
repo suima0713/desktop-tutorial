@@ -1,6 +1,4 @@
----- hard deps ----
 numpy>=1.24,<3.0
 pyarrow>=16.0,<17.0
-
----- optional ----
-pytest>=8.0<br>pytest-cov>=5.0
+pytest>=8.0
+pytest-cov>=5.0
