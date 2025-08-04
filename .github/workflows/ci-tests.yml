@@ -33,12 +33,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}   # tokenless なら削除
           slug: suima0713/desktop-tutorial           # ← 追加（アップロード先を本家に固定）
-          files: coverage.xml
+          files: reports/coverage.xml
           flags: unittests
           fail_ci_if_error: true
           verbose: true
-
-      - name: List workspace (debug)   # ← 一度だけ残して様子を見る
-        if: always()
-        run: |
-          find "$GITHUB_WORKSPACE" -name 'coverage.xml' -print -exec wc -l {} \;

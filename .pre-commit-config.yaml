@@ -22,7 +22,7 @@ repos:
       - id: ruff
         args:
           - --fix
-          - --exit-zero        # lint だけで失敗させない
+          - --exit-zero # lint だけで失敗させない
         stages: [pre-commit]
 
   # ---------- YAML linter ----------
@@ -38,3 +38,11 @@ repos:
                truthy: disable,
                line-length: {max: 120, allow-non-breakable-words: true}
              }}
+
+  - repo: local
+    hooks:
+      - id: cleanup-generated-files
+        name: Remove coverage & logs
+        entry: bash -c 'rm -f coverage.xml debug.log .coverage'
+        language: system
+        always_run: true
