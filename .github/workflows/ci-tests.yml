@@ -69,7 +69,8 @@ jobs:
             --cov-report=term-missing
 
       # 2️⃣ 生成した coverage.xml をアップロード (actions/upload-artifact@v4)
-      - uses: actions/upload-artifact@v4 # v3 は 2025-01-30 廃止予定 :contentReference[oaicite:1]{index=1}
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.python-version == '3.10' && matrix.pandas-channel == 'stable' }}
         with:
           name: coverage-xml-3.10-stable
           path: coverage.xml
