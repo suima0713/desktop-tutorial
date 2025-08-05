@@ -1,0 +1,51 @@
+---
+name: update-badges
+
+on:
+  workflow_run:
+    workflows: ["ci-tests"] # ← ci-tests.yml と合わせる
+    types: [completed]
+
+permissions:
+  contents: write # README 変更コミット
+
+jobs:
+  rewrite:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. アーティファクト取得
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-xml-3.10-stable # ci-tests で upload した名前
+
+      # 2. coverage % 抽出
+      - name: Parse coverage
+        id: cov
+        run: |
+          pct=$(python - <<'PY'
+          import xml.etree.ElementTree as ET
+          p=float(ET.parse('coverage.xml').getroot().attrib['line-rate'])*100
+          print(f"{p:.1f}")
+          PY
+          )
+          echo "pct=$pct" >> $GITHUB_OUTPUT
+
+      # 3. README のバッジ置換
+      - name: Patch README
+        run: |
+          NEW="https://img.shields.io/badge/coverage-${{ steps.cov.outputs.pct }}%25-brightgreen"
+          sed -i -E "s#https://img.shields.io/badge/coverage-[^ )]+#$NEW#g" README.md
+
+      # 4. 変更があればコミット
+      - name: Commit & Push
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "github-actions@github.com"
+          git add README.md
+          git diff --cached --quiet && echo "No change" || \
+          git commit -m "docs: update coverage badge [skip ci]"
+          git push
