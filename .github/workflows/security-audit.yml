@@ -1,0 +1,32 @@
+name: Security Audit
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # 毎週日曜3時(JST:12時)に実行
+  pull_request:
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+
+      - name: Export dependencies (runtime + dev)
+        run: poetry export --with dev --format=requirements.txt --without-hashes -o requirements.txt
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run pip-audit (fail on high vulnerabilities)
+        run: pip-audit -r requirements.txt --fail
