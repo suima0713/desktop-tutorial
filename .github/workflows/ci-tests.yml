@@ -28,11 +28,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry
+      - name: Install pipx and Poetry
         run: |
           python -m pip install --upgrade pip
-          pip install "poetry>=1.2"
-          which poetry
+          python -m pip install pipx
+          pipx install poetry
+          pipx ensurepath
           poetry --version
 
       - name: Enable poetry export
