@@ -35,21 +35,13 @@ jobs:
           poetry --version
 
       - name: Enable poetry export
-        run: poetry self add poetry-plugin-export
+        run: |
+          poetry self add poetry-plugin-export
+          poetry self show plugins
 
       - name: Export locked deps
         run: |
           poetry export -f requirements.txt --without-hashes --with dev -o requirements.txt
-
-      - name: Cache Poetry and pip
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.cache/pip
-          key: ${{ runner.os }}-py-${{ hashFiles('**/poetry.lock') }}-${{ matrix.python-version }}
-          restore-keys: |
-            ${{ runner.os }}-py-
 
       - name: Install dependencies via Poetry
         run: |
