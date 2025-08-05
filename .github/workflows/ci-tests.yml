@@ -31,11 +31,11 @@ jobs:
       - name: Install Poetry
         run: |
           python -m pip install --upgrade pip
-          pip install poetry                # 最新安定版を取得
+          pip install "poetry>=1.2"
+          poetry --version
 
       - name: Enable poetry export
-        run: |
-          poetry self add poetry-plugin-export
+        run: poetry self add poetry-plugin-export
 
       - name: Export locked deps
         run: |
