@@ -71,7 +71,7 @@ jobs:
       # 2️⃣ 生成した coverage.xml をアップロード (actions/upload-artifact@v4)
       - uses: actions/upload-artifact@v4 # v3 は 2025-01-30 廃止予定 :contentReference[oaicite:1]{index=1}
         with:
-          name: coverage-xml
+          name: coverage-xml-3.10-stable
           path: coverage.xml
 
       # 3️⃣ (任意) Codecov へアップロード  ※トークン必須
