@@ -2,7 +2,7 @@ name: Security Audit
 
 on:
   schedule:
-    - cron: '0 3 * * 0' # 毎週日曜3時(JST:12時)に実行
+    - cron: "0 3 * * 0" # 毎週日曜3時(JST:12時)に実行
   pull_request:
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install Poetry
         run: |

@@ -19,7 +19,7 @@ updates:
     ignore:
       - dependency-name: "py-serializable"
         versions:
-          - ">=2.0.0,<3.0.0"      # ← SemVer 範囲指定
+          - ">=2.0.0,<3.0.0" # ← SemVer 範囲指定
 
   # ---------------- GitHub Actions ----------------
   - package-ecosystem: "github-actions"

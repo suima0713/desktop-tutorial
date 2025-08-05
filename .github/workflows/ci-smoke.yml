@@ -2,7 +2,7 @@ name: CI スモーク
 
 on:
   push:
-    branches: ['**']
+    branches: ["**"]
   pull_request:
 
 permissions:
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   lint-smoke:
-    if: github.actor != 'dependabot[bot]'   # ← Dependabot PRではスキップする場合は残す
+    if: github.actor != 'dependabot[bot]' # ← Dependabot PRではスキップする場合は残す
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install pre-commit
         run: |

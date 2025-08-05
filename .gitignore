@@ -19,7 +19,6 @@ coverage.xml
 ############################################################
 # IDE / editor
 ############################################################
-.vscode/
 .idea/
 
 # ── logs ────────────────────────────────────────
@@ -56,3 +55,7 @@ Thumbs.db
 
 # coverage / reports
 reports/
+
+# VS Code
+/.vscode/*               # フォルダー内すべて無視
+!/.vscode/settings.json  # ただし settings.json だけ追跡
