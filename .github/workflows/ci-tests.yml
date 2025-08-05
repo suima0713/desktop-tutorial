@@ -31,6 +31,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry                # 最新安定版を取得
 
+      - name: Cache Poetry and pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-py-${{ hashFiles('**/poetry.lock') }}-${{ matrix.python-version }}
+          restore-keys: |
+            ${{ runner.os }}-py-
+
       - name: Install dependencies via Poetry
         run: |
           poetry config virtualenvs.create false
@@ -39,12 +49,3 @@ jobs:
           if [ "${{ matrix.pandas-channel }}" = "dev" ]; then
             python -m pip install --pre --upgrade pandas
           fi
-
-      - name: Run unit tests with coverage
-        run: pytest --cov=src --cov-report=xml
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          use_oidc: true
-          files: ./coverage.xml
