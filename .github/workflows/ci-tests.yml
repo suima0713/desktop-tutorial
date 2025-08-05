@@ -71,3 +71,8 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Debug Poetry
+        run: |
+          poetry --version
+          poetry self show plugins
