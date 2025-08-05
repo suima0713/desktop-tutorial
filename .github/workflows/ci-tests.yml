@@ -81,3 +81,8 @@ jobs:
       - name: List installed packages
         run: |
           ls ~/.local/bin
+      - name: Add pipx bin to PATH
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          which poetry
+          poetry --version
