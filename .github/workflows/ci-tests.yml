@@ -6,49 +6,46 @@ on:
     branches: [main]
   pull_request:
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   tests:
+    name: Test (${{ matrix.python-version }} • ${{ matrix.pandas-channel }})
     runs-on: ubuntu-latest
+
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.10', '3.11']
-        pandas-channel: ['dev', 'stable']
+        pandas-channel: ['stable', 'dev']
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      # ---------- install deps ----------
-      - name: Install dependencies
+      - name: Install Poetry
         run: |
-          pip install -r requirements.txt
-          pip install -e .
-          pip install pytest pytest-cov
-          if [[ "${{ matrix.pandas-channel }}" == "dev" ]]; then
-            pip install --pre pandas -U    # 開発版
-          else
-            pip install "pandas~=2.3"      # 安定版
-          fi
-          pip list | grep pandas           # debug
+          python -m pip install --upgrade pip
+          pip install poetry                # 最新安定版を取得
 
-      # ---------- run tests -------------
-      - name: Run unit tests + coverage
-        run: |
-          pytest --cov=src --cov-report=xml
-          ls -l coverage.xml
-
-      # ---------- upload ---------------
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Cache Poetry and pip
+        uses: actions/cache@v4
         with:
-          use_oidc: true
-          files: ./coverage.xml
-          flags: unittests
-          verbose: true
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-py-${{ hashFiles('**/poetry.lock') }}-${{ matrix.python-version }}
+          restore-keys: |
+            ${{ runner.os }}-py-
+
+      - name: Install dependencies via Poetry
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --with dev
+          # pandas dev チャンネルのみ preview 版に差し替え
+          if [ "${{ matrix.pandas-channel }}" = "dev" ]; then
+            python -m pip install --pre --upgrade pandas
+          fi

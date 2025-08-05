@@ -25,26 +25,21 @@ packages = [
 
 # --------------- ランタイム依存 ---------------
 [tool.poetry.dependencies]
-python = "^3.8"
-pandas   = "^2.3.1"                          # 明示的に依存へ
-pyarrow  = "^16"
-yfinance = { version = "^0.2.65", extras = ["rapidjson"] }
+python = ">=3.9,<4.0"
+pandas = "^2.3.1"
+pyarrow = "^16.1"
+yfinance = "0.2.33"
+python-rapidjson = "^1.21"
 
-# --------------- 開発 / CI 用ツール ---------------
 [tool.poetry.group.dev.dependencies]
-black      = "^25.1.0"
-pytest     = "^8.2"
-pytest-cov = "^6.2.1"
-ruff       = "^0.4"                          # Linter（任意）
+pytest      = "^8.2"
+pytest-cov  = "^5.0"
+ruff        = "^0.4"
+black       = "^24.4"
+python-rapidjson = "^1.21"
+yamllint    = "^1.37.1"
+# yamllint  = "^1.36"   ← 3.9 対応版に固定（必要なら）
 
-# --------------- ビルドシステム ---------------
-yamllint = "^1.37.1"
 [build-system]
 requires      = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-# （必要ならミラーや社内 PyPI を追記）
-[[tool.poetry.source]]
-name     = "pypi-main"
-url      = "https://pypi.org/simple"
-priority = "primary"
