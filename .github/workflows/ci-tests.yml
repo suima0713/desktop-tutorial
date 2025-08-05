@@ -33,6 +33,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry                # 最新安定版を取得
 
+      - name: Enable poetry export
+        run: |
+          poetry self add poetry-plugin-export
+
+      - name: Export locked deps
+        run: |
+          poetry export -f requirements.txt --without-hashes --with dev -o requirements.txt
+
       - name: Cache Poetry and pip
         uses: actions/cache@v4
         with:
