@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   tests:
@@ -49,3 +51,22 @@ jobs:
           if [ "${{ matrix.pandas-channel }}" = "dev" ]; then
             python -m pip install --pre --upgrade pandas
           fi
+
+      # 1️⃣ テスト実行ステップ末尾に --cov 付き pytest を確実に置く
+      - name: Run tests
+        run: |
+          poetry run pytest \
+            --cov=desktop_tutorial \
+            --cov-report=xml:coverage.xml \
+            --cov-report=term-missing
+
+      # 2️⃣ 生成した coverage.xml をアップロード (actions/upload-artifact@v4)
+      - uses: actions/upload-artifact@v4   # v3 は 2025-01-30 廃止予定 :contentReference[oaicite:1]{index=1}
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+      # 3️⃣ (任意) Codecov へアップロード  ※トークン必須
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
