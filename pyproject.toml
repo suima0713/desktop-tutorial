@@ -25,12 +25,13 @@ packages = [
 
 # --------------- ランタイム依存 ---------------
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9,<4.0"
 pandas   = "^2.3.1"                          # 明示的に依存へ
 pyarrow  = "^16"
 yfinance = "^0.2.37"
 
 # --------------- 開発 / CI 用ツール ---------------
+python-rapidjson = "^1.14"
 [tool.poetry.group.dev.dependencies]
 black      = "^25.1.0"
 pytest     = "^8.2"
