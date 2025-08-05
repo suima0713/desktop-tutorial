@@ -37,7 +37,9 @@ jobs:
 
       - name: Add pipx bin to PATH
         run: |
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.local/bin:$PATH"
+          which poetry
+          poetry --version
 
       - name: Debug Poetry
         run: |
