@@ -2,7 +2,7 @@ name: Security Audit
 
 on:
   schedule:
-    - cron: "0 3 * * 0" # 毎週日曜日JST:12時に実行
+    - cron: "0 3 * * 0" # 毎週日曜日3時に実行
   pull_request:
 
 jobs:
@@ -29,5 +29,6 @@ jobs:
       - name: Install pip-audit
         run: pip install pip-audit
 
-      - name: Run pip-audit (fail on high vulnerabilities)
-        run: pip-audit -r requirements.txt --fail
+      # pip-auditは脆弱性が見つかると自動的に非ゼロの終了コードを返す
+      - name: Run pip-audit
+        run: pip-audit -r requirements.txt
