@@ -28,13 +28,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry (pip)
+      - name: Install Poetry (official)
         run: |
-          python -m pip install --upgrade pip
-          pip install --user poetry
-
-      - name: Add Poetry to PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Debug Poetry
         run: |
