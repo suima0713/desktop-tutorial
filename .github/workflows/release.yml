@@ -2,16 +2,16 @@
 name: Release
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
-  id-token: write   # ← OIDC で必須
-  contents: write   # Release を作る場合だけ
+  id-token: write # ← OIDC で必須
+  contents: write # Release を作る場合だけ
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: release    # ← ★追加★  (PendingPublisher の Env と同じ文字列)
+    environment: release # ← ★追加★  (PendingPublisher の Env と同じ文字列)
 
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install Poetry
         run: pip install poetry==2.1.3
@@ -27,7 +27,7 @@ jobs:
       - name: Build package
         run: poetry build
 
-      - name: Publish to TestPyPI   # ← password は不要
+      - name: Publish to TestPyPI # ← password は不要
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/

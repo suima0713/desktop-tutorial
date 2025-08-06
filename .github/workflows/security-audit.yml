@@ -2,7 +2,7 @@ name: Security Audit
 
 on:
   schedule:
-    - cron: '0 3 * * 0' # 毎週日曜3時(JST:12時)に実行
+    - cron: "0 3 * * 0" # 毎週日曜日3時に実行
   pull_request:
 
 jobs:
@@ -15,12 +15,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Install Poetry
+      # Poetry 1.7.1を明示的にインストール
+      - name: Install Poetry 1.7.1
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install "poetry==1.7.1"
 
       - name: Export dependencies (runtime + dev)
         run: poetry export --with dev --format=requirements.txt --without-hashes -o requirements.txt
@@ -28,5 +29,6 @@ jobs:
       - name: Install pip-audit
         run: pip install pip-audit
 
-      - name: Run pip-audit (fail on high vulnerabilities)
-        run: pip-audit -r requirements.txt --fail
+      # pip-auditは脆弱性が見つかると自動的に非ゼロの終了コードを返す
+      - name: Run pip-audit
+        run: pip-audit -r requirements.txt
