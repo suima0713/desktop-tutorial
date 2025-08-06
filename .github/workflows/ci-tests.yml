@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # 既存の安定バージョンを維持 + 互換プラグインのみ調整
+      # Poetry 1.7.1 + 互換プラグイン 1.6.0 (依存関係競合を回避)
       - name: Install Poetry 1.7.1 with compatible plugin
         run: |
           python -m pip install -U pip
