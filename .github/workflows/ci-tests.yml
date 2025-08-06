@@ -39,8 +39,10 @@ jobs:
           poetry self add poetry-plugin-export
           poetry --version
 
-      - name: Verify Poetry version
-        run: poetry --version
+      - name: Show Poetry path and version
+        run: |
+          which poetry
+          poetry --version
 
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
