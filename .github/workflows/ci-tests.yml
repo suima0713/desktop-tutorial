@@ -32,12 +32,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry
+      - name: Install Poetry and export plugin
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version 1.7.1
+          python -m pip install -U pip
+          pip install "poetry==1.7.1"
+          poetry self add poetry-plugin-export
+          poetry --version
 
       - name: Verify Poetry version
-        run: python3 -m poetry --version
+        run: poetry --version
 
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
@@ -47,16 +50,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m poetry config virtualenvs.create true
-          python3 -m poetry config virtualenvs.in-project true
-          python3 -m poetry install --no-interaction
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction
           if [ "${{ matrix.pandas-channel }}" = "dev" ]; then
-            python3 -m poetry run pip install --pre --upgrade pandas
+            poetry run pip install --pre --upgrade pandas
           fi
+
+      - name: Export requirements.txt
+        run: poetry export -f requirements.txt --output requirements.txt --without-hashes --with dev
 
       - name: Run tests
         run: |
-          python3 -m poetry run pytest \
+          poetry run pytest \
             --cov=desktop_tutorial \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing
@@ -76,5 +82,5 @@ jobs:
           file: coverage.xml
           fail_ci_if_error: false
 
-      - name: Verify Poetry version
+      - name: Verify Poetry version (final)
         run: poetry --version
