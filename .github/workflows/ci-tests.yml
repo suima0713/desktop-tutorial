@@ -31,7 +31,8 @@ jobs:
       - name: Install Poetry (pip)
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install --user poetry
+          export PATH="$HOME/.local/bin:$PATH"
           which poetry
           poetry --version
 
@@ -78,3 +79,18 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Find poetry binary
+        run: |
+          find $HOME -name poetry
+          find /usr -name poetry
+          python -m pip show poetry
+
+      - name: Create venv
+        run: python -m venv .venv
+
+      - name: Activate venv and install Poetry
+        run: |
+          source .venv/bin/activate
+          pip install poetry
+          poetry --version
