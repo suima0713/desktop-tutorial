@@ -28,27 +28,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry (official)
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
       - name: Debug Poetry
         run: |
           which poetry
           poetry --version
-          poetry self show plugins
-
-      - name: List installed packages
-        run: |
-          ls ~/.local/bin
-
-      - name: List installed Python packages
-        run: pip list
-
-      - name: Enable poetry export
-        run: |
-          poetry self add poetry-plugin-export
           poetry self show plugins
 
       - name: Export locked deps
