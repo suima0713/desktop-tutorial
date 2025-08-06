@@ -46,6 +46,9 @@ jobs:
         run: |
           ls ~/.local/bin
 
+      - name: List installed Python packages
+        run: pip list
+
       - name: Enable poetry export
         run: |
           poetry self add poetry-plugin-export
@@ -62,6 +65,14 @@ jobs:
           if [ "${{ matrix.pandas-channel }}" = "dev" ]; then
             python -m pip install --pre --upgrade pandas
           fi
+
+      - name: Cache Poetry virtualenvs
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            poetry-${{ runner.os }}-${{ matrix.python-version }}-
 
       - name: Run tests
         run: |
@@ -80,17 +91,13 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Find poetry binary
-        run: |
-          find $HOME -name poetry
-          find /usr -name poetry
-          python -m pip show poetry
+      - name: Show working directory
+        run: pwd
 
-      - name: Create venv
-        run: python -m venv .venv
-
-      - name: Activate venv and install Poetry
+      - name: Show Python and pip version
         run: |
-          source .venv/bin/activate
-          pip install poetry
-          poetry --version
+          python --version
+          pip --version
+
+      - name: List workspace files
+        run: ls -l
