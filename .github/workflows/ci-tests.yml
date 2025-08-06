@@ -36,31 +36,6 @@ jobs:
           virtualenvs-in-project: true
           installer: pip
 
-      - name: Setup Poetry PATH and verify installation
-        run: |
-          if [ -f "$HOME/.local/bin/poetry" ]; then
-            echo "$HOME/.local/bin" >> $GITHUB_PATH
-            export PATH="$HOME/.local/bin:$PATH"
-            echo "Poetry found in ~/.local/bin/"
-          elif [ -f "$HOME/.poetry/bin/poetry" ]; then
-            echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-            export PATH="$HOME/.poetry/bin:$PATH"
-            echo "Poetry found in ~/.poetry/bin/"
-          else
-            POETRY_PATH=$(which poetry 2>/dev/null || find /usr/local /opt -name "poetry" -type f 2>/dev/null | head -1)
-            if [ -n "$POETRY_PATH" ]; then
-              POETRY_DIR=$(dirname "$POETRY_PATH")
-              echo "$POETRY_DIR" >> $GITHUB_PATH
-              export PATH="$POETRY_DIR:$PATH"
-              echo "Poetry found at: $POETRY_PATH"
-            else
-              echo "Poetry not found, attempting pip install"
-              pip install poetry
-            fi
-          fi
-          poetry --version
-          poetry config --list
-
       - name: Export locked deps
         run: |
           poetry export -f requirements.txt --without-hashes --with dev -o requirements.txt
@@ -79,10 +54,7 @@ jobs:
           path: ~/.cache/pypoetry
           key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            poetry-${{ runner.os }}-${{ matrix.python-version }}-
-
-      - name: Add Poetry to PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+            poetry-${{ runner.os }}-${{ matrix.python-version }}
 
       - name: Run tests
         run: |
@@ -100,14 +72,3 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Show working directory
-        run: pwd
-
-      - name: Show Python and pip version
-        run: |
-          python --version
-          pip --version
-
-      - name: List workspace files
-        run: ls -l
