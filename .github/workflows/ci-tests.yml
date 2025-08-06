@@ -12,7 +12,7 @@ jobs:
   tests:
     name: Test (${{ matrix.python-version }}, ${{ matrix.pandas-channel }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # タイムアウトを設定
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -29,31 +29,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Poetry を直接 pip でインストール
+      # Poetry を公式インストーラーでインストール
       - name: Install Poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry==1.6.1
-          poetry --version
+          curl -sSL https://install.python-poetry.org | python3 -
 
-      # Poetry を PATH に追加
-      - name: Add Poetry to PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      # PATH が正しく設定されているか確認
-      - name: Verify Poetry installation
+      - name: Verify Poetry and Configure
         run: |
-          echo "PATH: $PATH"
-          which python
-          which pip
-          python -m poetry --version
-
-      # Poetry の設定を確認・修正
-      - name: Configure Poetry
-        run: |
-          python -m poetry config virtualenvs.create true
-          python -m poetry config virtualenvs.in-project true
-          python -m poetry config installer.max-workers 10
+          python3 -m poetry --version
+          python3 -m poetry config virtualenvs.create true
+          python3 -m poetry config virtualenvs.in-project true
+          python3 -m poetry config installer.max-workers 10
 
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
@@ -63,26 +49,24 @@ jobs:
           restore-keys: |
             poetry-${{ runner.os }}-${{ matrix.python-version }}-
 
-      # 依存関係のインストールを段階的に実行
       - name: Install dependencies
         run: |
-          python -m poetry install --no-interaction --verbose
-          # pandas-channel が dev の場合のみ開発版をインストール
+          python3 -m poetry install --no-interaction --verbose
           if [ "${{ matrix.pandas-channel }}" = "dev" ]; then
-            python -m poetry run python -m pip install --pre --upgrade pandas
+            python3 -m poetry run python -m pip install --pre --upgrade pandas
           fi
 
       - name: Export locked deps
         run: |
-          python -m poetry export -f requirements.txt --without-hashes --with dev -o requirements.txt
+          python3 -m poetry export -f requirements.txt --without-hashes --with dev -o requirements.txt
 
       - name: Run tests
         run: |
-          python -m poetry run pytest \
+          python3 -m poetry run pytest \
             --cov=desktop_tutorial \
             --cov-report=xml:coverage.xml \
             --cov-report=term-missing \
-            --maxfail=5  # 5回失敗したら停止
+            --maxfail=5
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
@@ -97,4 +81,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
-          fail_ci_if_error: false # Codecovエラーでもビルドを止めない
+          fail_ci_if_error: false
