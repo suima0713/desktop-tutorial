@@ -41,6 +41,7 @@ jobs:
       - name: Install Poetry 1.x
         run: |
           # Poetry 1.8.x を明示的にインストール（最新の1.x系）
+          # Poetry 1.8.3を明示的にインストール（最新の1.x系）
           curl -sSL https://install.python-poetry.org | python3 - --version 1.8.3
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           poetry --version  # バージョン確認
