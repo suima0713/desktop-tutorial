@@ -1,3 +1,6 @@
+# .gitignore を更新
+$gitignoreContent = @"
+
 # ── python build / test artifacts ────────────────
 *.py[cod]           # コンパイル済み
 __pycache__/
@@ -15,6 +18,8 @@ coverage.*
 coverage.svg
 coverage.xml
 *.coverage.*
+*$py.class
+"@
 
 ############################################################
 # IDE / editor
@@ -59,3 +64,6 @@ reports/
 # VS Code
 /.vscode/*               # フォルダー内すべて無視
 !/.vscode/settings.json  # ただし settings.json だけ追跡
+
+Add-Content -Path ".gitignore" -Value $gitignoreContent
+Write-Host "✅ Updated .gitignore" -ForegroundColor Green
