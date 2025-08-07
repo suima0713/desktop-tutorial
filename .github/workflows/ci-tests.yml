@@ -1,3 +1,4 @@
+---
 name: CI Tests
 
 on:
@@ -31,7 +32,9 @@ jobs:
           path: |
             ~/.cache/pip
             ~/.cache/pypoetry
-          key: ${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: >-
+            ${{ runner.os }}-py${{ matrix.python-version }}-${{
+            hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-py${{ matrix.python-version }}-
 
@@ -44,16 +47,21 @@ jobs:
 
       - name: Validate project structure
         run: |
-          PROJECT_NAME=$(grep '^name = ' pyproject.toml | cut -d'"' -f2 | tr '-' '_')
+          PROJECT_NAME=$(grep '^name = ' pyproject.toml | \
+            cut -d'"' -f2 | tr '-' '_')
           echo "Project: $PROJECT_NAME"
 
-          if [ ! -d "$PROJECT_NAME" ] && [ ! -d "src/$PROJECT_NAME" ]; then
+          if [ ! -d "$PROJECT_NAME" ] && \
+             [ ! -d "src/$PROJECT_NAME" ]; then
             echo "Creating $PROJECT_NAME directory"
             mkdir -p "$PROJECT_NAME"
-            echo '__version__ = "0.1.0"' > "$PROJECT_NAME/__init__.py"
+            echo '__version__ = "0.1.0"' > \
+              "$PROJECT_NAME/__init__.py"
           fi
 
-          [ ! -d "tests" ] && mkdir -p tests && touch tests/__init__.py
+          [ ! -d "tests" ] && \
+            mkdir -p tests && \
+            touch tests/__init__.py
 
       - name: Install dependencies
         run: |
@@ -62,24 +70,40 @@ jobs:
 
       - name: Export requirements
         run: |
-          poetry export --without-hashes --format=requirements.txt --output requirements.txt
+          poetry export \
+            --without-hashes \
+            --format=requirements.txt \
+            --output requirements.txt
           echo "Dependencies: $(wc -l < requirements.txt)"
 
       - name: Run security audit
         continue-on-error: true
         run: |
           pip install pip-audit
-          pip-audit -r requirements.txt --format json > audit.json 2>&1 || true
+          pip-audit -r requirements.txt \
+            --format json > audit.json 2>&1 || true
           if [ -f audit.json ]; then
-            python3 -c "import json; d=json.load(open('audit.json')); print(f'Found {len(d.get(\"vulnerabilities\",[]))} vulnerabilities')"
+            python3 -c "import json; \
+              d=json.load(open('audit.json')); \
+              v=d.get('vulnerabilities',[]); \
+              print(f'Found {len(v)} vulnerabilities')"
           fi
 
       - name: Run tests with coverage
         run: |
-          PROJECT_NAME=$(grep '^name = ' pyproject.toml | cut -d'"' -f2 | tr '-' '_')
+          PROJECT_NAME=$(grep '^name = ' pyproject.toml | \
+            cut -d'"' -f2 | tr '-' '_')
 
-          poetry run pytest tests/ --cov="$PROJECT_NAME" --cov-report=xml --cov-report=term -v || \
-          poetry run pytest --cov=. --cov-report=xml --cov-report=term -v || \
+          poetry run pytest tests/ \
+            --cov="$PROJECT_NAME" \
+            --cov-report=xml \
+            --cov-report=term \
+            -v || \
+          poetry run pytest \
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=term \
+            -v || \
           echo "No tests found"
 
           if [ ! -f coverage.xml ]; then
@@ -89,7 +113,8 @@ jobs:
           <coverage version="1.0">
             <sources><source>.</source></sources>
             <packages>
-              <package name="." line-rate="0" branch-rate="0" complexity="0">
+              <package name="." line-rate="0" \
+                branch-rate="0" complexity="0">
                 <classes/>
               </package>
             </packages>
