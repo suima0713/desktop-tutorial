@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload audit results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-audit-report
           path: |
@@ -104,3 +104,6 @@ jobs:
               repo: context.repo.repo,
               body: '⚠️ Security vulnerabilities detected in dependencies. Please review the audit report.'
             })
+
+      - name: Codecov
+        uses: codecov/codecov-action@v4
