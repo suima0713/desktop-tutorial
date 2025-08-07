@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+
 from desktop_tutorial.providers.yahoo import YahooProvider
 
 

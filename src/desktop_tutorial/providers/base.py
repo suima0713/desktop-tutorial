@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import TypedDict, Protocol, final
+from typing import Protocol, TypedDict, final
 
 
 class PriceBar(TypedDict):

@@ -1,0 +1,5 @@
+ci:
+  # 月1回、自動で pre-commit autoupdate PR を出す
+  autoupdate_schedule: monthly
+
+skip: []
