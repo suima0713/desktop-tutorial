@@ -1,29 +1,41 @@
 version: 2
-
 updates:
-  # ---------------- Python dependencies ----------------
+  # Python の依存関係
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
-
-    # PR グループ化（例：lint 系をまとめる）
+      day: "monday"
+      time: "05:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "auto"
     groups:
-      lint:
+      python-core:
         patterns:
-          - "pre-commit"
-          - "ruff*"
+          - "python"
+          - "pip"
+          - "setuptools"
+      python-test:
+        patterns:
+          - "pytest*"
+          - "coverage*"
+    versioning-strategy: "increase"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
 
-    # バージョン無視設定の正しい書式
-    ignore:
-      - dependency-name: "py-serializable"
-        versions:
-          - ">=2.0.0,<3.0.0" # ← SemVer 範囲指定
-
-  # ---------------- GitHub Actions ----------------
+  # GitHub Actions の更新
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+      day: "monday"
+      time: "05:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
