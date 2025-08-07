@@ -24,6 +24,7 @@ pandas = "^2.1.0"
 pyarrow = "^17.0.0"  # 16.1.0から17.0.0以上にアップグレード
 yfinance = "0.2.33"
 python-rapidjson = "^1.21.0"
+platformdirs = "^4.2.0"  # pip-auditの要求に合わせる
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
