@@ -58,7 +58,7 @@ jobs:
           PROJECT_NAME_UNDERSCORE=$(echo "$PROJECT_NAME" | tr '-' '_')
           echo "Project: $PROJECT_NAME (Python package: $PROJECT_NAME_UNDERSCORE)"
 
-          # プロジェクトディレクトリの確認と作成
+          # プロジェクトディレクトリ確認と作成
           if [ "$PROJECT_NAME_UNDERSCORE" != "your_project_name" ]; then
             if [ ! -d "$PROJECT_NAME_UNDERSCORE" ] && [ ! -d "src/$PROJECT_NAME_UNDERSCORE" ]; then
               echo "Creating $PROJECT_NAME_UNDERSCORE directory"
