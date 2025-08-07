@@ -1,0 +1,50 @@
+---
+repos:
+  # ---------- General housekeeping ----------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        stages: [pre-commit]
+      - id: trailing-whitespace
+        stages: [pre-commit]
+      - id: check-merge-conflict
+
+  # ---------- Code formatter ----------
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+
+  # ---------- Linter ----------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.5
+    hooks:
+      - id: ruff
+        args:
+          - --fix
+          - --exit-zero # lint だけで失敗させない
+        stages: [pre-commit]
+
+  # ---------- YAML linter ----------
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args:
+          - -d
+          - >
+            {extends: default,
+             rules: {
+               truthy: disable,
+               line-length: {max: 120, allow-non-breakable-words: true}
+             }}
+
+  - repo: local
+    hooks:
+      - id: cleanup-generated-files
+        name: Remove coverage & logs
+        entry: bash -c 'rm -f coverage.xml debug.log .coverage'
+        language: system
+        always_run: true
+        stages: [manual] # ← これだけ追加
