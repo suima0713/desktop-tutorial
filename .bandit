@@ -1,0 +1,22 @@
+# Bandit configuration
+exclude_dirs:
+  - /tests/
+  - /test/
+  - /.venv/
+  - /venv/
+  - /.tox/
+  - /build/
+  - /dist/
+
+skips:
+  - B101 # assert_used - テストで使用
+  - B601 # shell_with_subprocess - 必要な場合がある
+
+tests:
+  - B201 # flask_debug_true
+  - B301 # pickle
+  - B302 # marshal
+  - B303 # md5
+  - B304 # des
+  - B305 # cipher
+  - B306 # mktemp_q
