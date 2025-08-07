@@ -1,11 +1,23 @@
-# desktop‑tutorial
+# Desktop Tutorial
 
-[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
-[![Release](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/<OWNER>/<REPO>/actions/workflows/release.yml)
+<!-- Status Badges -->
+<div align="center">
+
+[![CI Tests](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml)
 [![codecov](https://codecov.io/gh/suima0713/desktop-tutorial/branch/main/graph/badge.svg)](https://codecov.io/gh/suima0713/desktop-tutorial)
+[![Security Audit](https://github.com/suima0713/desktop-tutorial/actions/workflows/security-audit.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/security-audit.yml)
+[![Static Analysis](https://github.com/suima0713/desktop-tutorial/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/static-analysis.yml)
 
-<!-- PyPI は公開後に有効化 -->
-<!-- [![PyPI](https://img.shields.io/pypi/v/desktop-tutorial.svg)](https://pypi.org/project/desktop-tutorial/) -->
+[![Python](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue)](https://www.python.org/)
+[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
+## 📖 Overview
 
 ## Quick Overview
 
