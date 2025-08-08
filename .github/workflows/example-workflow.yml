@@ -1,0 +1,52 @@
+---
+name: Example Workflow
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-with-cache:
+    name: Test with Caching
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 必須：最初にチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # 2. Python環境のセットアップ
+      - name: Setup Python project
+        uses: ./.github/actions/setup-project
+        with:
+          python-version: '3.11'
+      
+      # 3. キャッシュの設定（cache-dependencies使用）
+      - name: Cache Python dependencies
+        uses: ./.github/actions/cache-dependencies
+        with:
+          cache-key-prefix: 'deps'   # オプション
+          python-version: '3.11'      # オプション
+      
+      # 4. テストの実行
+      - name: Run tests
+        run: |
+          python --version
+          pip list
+          echo "✅ Tests completed"
+  
+  simple-echo-test:
+    name: Simple Echo Test
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 必須：最初にチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # 2. Echo actionの使用
+      - name: Run echo action
+        uses: ./.github/actions/echo-action
+      
+      # 3. 確認
+      - name: Verify
+        run: echo "✅ Echo action worked!"
