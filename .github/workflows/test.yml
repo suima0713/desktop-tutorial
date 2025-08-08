@@ -1,0 +1,28 @@
+---
+name: Test Composite Actions
+on:
+  push:
+    branches: [feature/composite-actions]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 最初にチェックアウトを実行（必須）
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      # 2. その後でComposite Actionを使用
+      - name: Setup Python Project
+        uses: ./.github/actions/setup-project
+        with:
+          python-version: '3.11'
+      
+      # 3. 動作確認
+      - name: Verify Python
+        run: |
+          python --version
+          pip --version
+          echo "✅ Setup completed successfully!"

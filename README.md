@@ -32,3 +32,15 @@ poetry run pytest
 poetry run safety check
 License
 MIT
+
+# GitHub Composite Actions
+
+## ✅ 実装済みのComposite Actions
+
+### 📦 setup-project
+Python環境のセットアップを行うアクション
+
+```yaml
+- uses: ./.github/actions/setup-project
+  with:
+    python-version: '3.11'  # オプション、デフォルト: 3.11

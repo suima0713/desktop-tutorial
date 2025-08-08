@@ -1,0 +1,25 @@
+name: Simple Test
+on:
+  push:
+    branches: [feature/composite-actions]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # 必須：最初に実行
+      - name: Test message
+        run: echo "Composite Actions are working!"
+      
+  test-with-composite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # 必須：最初に実行
+      - name: Test composite action
+        uses: ./.github/actions/setup-project
+        with:
+          python-version: '3.11'
+      - name: Verify
+        run: python --version
