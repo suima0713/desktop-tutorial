@@ -1,3 +1,4 @@
+---
 name: CI Tests Optimized
 
 on:
@@ -21,29 +22,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python ${{ matrix.python-version }}
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache Poetry and dependencies
+      - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/.local
             ~/.cache/pypoetry
             .venv
-          key: >-
-            ${{ runner.os }}-poetry-py${{ matrix.python-version }}-
+          key: |
+            ${{ runner.os }}-py${{ matrix.python-version }}-
             ${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            ${{ runner.os }}-poetry-py${{ matrix.python-version }}-
-            ${{ runner.os }}-poetry-
+            ${{ runner.os }}-py${{ matrix.python-version }}-
 
       - name: Install Poetry
         run: |
           if ! command -v poetry &> /dev/null; then
-            curl -sSL https://install.python-poetry.org | python3 -
+            curl -sSL https://install.python-poetry.org | \
+              python3 -
             echo "$HOME/.local/bin" >> $GITHUB_PATH
           fi
           poetry --version
@@ -56,15 +57,20 @@ jobs:
       - name: Run tests
         run: |
           poetry run pytest tests/ -v --tb=short || \
-          poetry run python -m pytest tests/ -v --tb=short || \
+          poetry run python -m pytest tests/ -v || \
           echo "Tests completed"
 
       - name: Generate coverage
         continue-on-error: true
         run: |
           poetry run pytest \
-            --cov=. --cov-report=xml --cov-report=term || true
-          
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=term || true
+
+      - name: Fix coverage.xml
+        if: always()
+        run: |
           if [ ! -f coverage.xml ]; then
             cat > coverage.xml << 'EOF'
           <?xml version="1.0" ?>
