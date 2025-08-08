@@ -15,9 +15,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    
+    # Checkout は呼び出し側で実行する必要があるため削除
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
