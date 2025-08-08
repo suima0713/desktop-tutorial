@@ -1,0 +1,12 @@
+﻿---
+name: 'Cache Dependencies'
+description: 'Cache pip dependencies'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: deps-${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}

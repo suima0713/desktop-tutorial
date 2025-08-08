@@ -1,0 +1,42 @@
+﻿---
+name: 'Cache Dependencies'
+description: 'Cache management for dependencies'
+
+inputs:
+  cache-key-prefix:
+    description: 'Cache key prefix'
+    required: false
+    default: 'deps'
+  python-version:
+    description: 'Python version'
+    required: false
+    default: '3.11'
+
+outputs:
+  cache-hit:
+    description: 'Cache hit status'
+    value: ${{ steps.cache.outputs.cache-hit }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache pip packages
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.local
+          ~/AppData/Local/pip/Cache
+        key: ${{ inputs.cache-key-prefix }}-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ inputs.cache-key-prefix }}-${{ runner.os }}-py${{ inputs.python-version }}-
+
+    - name: Display cache status
+      shell: bash
+      run: |
+        if [ "${{ steps.cache.outputs.cache-hit }}" == "true" ]; then
+          echo "✅ Cache hit!"
+        else
+          echo "⚠️ Cache miss"
+        fi
