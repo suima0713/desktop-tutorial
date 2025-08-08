@@ -25,9 +25,9 @@ if ($BeforeFile -and $AfterFile) {
     $afterLines = Count-Lines $AfterFile
     $beforeDups = Count-Duplicates $BeforeFile
     $afterDups = Count-Duplicates $AfterFile
-    
+
     $reduction = [math]::Round((($beforeLines - $afterLines) / $beforeLines) * 100, 2)
-    
+
     Write-Host "`n📊 Improvement Metrics:" -ForegroundColor Cyan
     Write-Host "  Lines of code: $beforeLines → $afterLines (-$reduction%)" -ForegroundColor Green
     Write-Host "  Duplicate actions: $($beforeDups.Total) → $($afterDups.Total)" -ForegroundColor Green

@@ -5,7 +5,7 @@ Write-Host "=" * 50
 $before = @"
 従来のワークフロー：
 - checkout: 3箇所で重複
-- setup-python: 3箇所で重複  
+- setup-python: 3箇所で重複
 - cache: 3箇所で重複
 - pip install: 3箇所で重複
 合計: 12個の重複ステップ
@@ -21,7 +21,7 @@ Composite Actions使用後：
 Write-Host "`n❌ BEFORE:" -ForegroundColor Red
 Write-Host $before
 
-Write-Host "`n✅ AFTER:" -ForegroundColor Green  
+Write-Host "`n✅ AFTER:" -ForegroundColor Green
 Write-Host $after
 
 Write-Host "`n💡 改善効果:" -ForegroundColor Yellow

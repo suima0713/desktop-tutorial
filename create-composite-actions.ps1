@@ -22,13 +22,13 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v4
-    
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: `${{ inputs.python-version }}
         cache: 'pip'
-    
+
     - name: Install dependencies
       shell: bash
       run: |

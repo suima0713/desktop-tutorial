@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'Cache Dependencies'
 description: 'Cache management for dependencies'
 
@@ -28,9 +28,15 @@ runs:
           ~/.cache/pip
           ~/.local
           ~/AppData/Local/pip/Cache
-        key: ${{ inputs.cache-key-prefix }}-${{ runner.os }}-py${{ inputs.python-version }}-${{ hashFiles('**/requirements*.txt') }}
+        key: >-
+          ${{ inputs.cache-key-prefix }}-
+          ${{ runner.os }}-
+          py${{ inputs.python-version }}-
+          ${{ hashFiles('**/requirements*.txt') }}
         restore-keys: |
-          ${{ inputs.cache-key-prefix }}-${{ runner.os }}-py${{ inputs.python-version }}-
+          ${{ inputs.cache-key-prefix }}-
+          ${{ runner.os }}-
+          py${{ inputs.python-version }}-
 
     - name: Display cache status
       shell: bash
