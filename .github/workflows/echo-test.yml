@@ -1,0 +1,25 @@
+name: Echo Action Test
+on:
+  push:
+    branches: [feature/composite-actions]
+  pull_request:
+    branches: [main]
+
+jobs:
+  echo-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: List files for debugging
+        run: |
+          echo "📁 Repository structure:"
+          ls -la
+          echo "📁 .github structure:"
+          ls -la .github/
+          echo "📁 .github/actions structure:"
+          ls -la .github/actions/
+      
+      - name: Test Echo Action
+        uses: ./.github/actions/echo-action
