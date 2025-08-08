@@ -1,0 +1,35 @@
+name: Usage Monitor
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"  # Every Monday at 9:00
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check GitHub Actions Usage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## 📊 Weekly Actions Usage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Get recent workflow runs (limit to 10)
+          gh api /repos/${{ github.repository }}/actions/runs \
+            --jq ".workflow_runs[:10]" \
+            | jq -r ".[] | \"- \\(.name): \\(.status)\"" \
+            >> $GITHUB_STEP_SUMMARY || true
+
+      - name: Cache Analysis
+        run: |
+          echo "## 💾 Cache Usage" >> $GITHUB_STEP_SUMMARY
+          gh api /repos/${{ github.repository }}/actions/cache/usage \
+            | jq -r "\"Caches: \\(.active_caches_count)\"" \
+            >> $GITHUB_STEP_SUMMARY || true
