@@ -1,1 +1,1 @@
-# License Policy Implementation (Coming Soon)
+# License Policy (Coming Soon)
