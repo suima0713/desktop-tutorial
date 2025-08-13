@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISP v1.1 - Trading System 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            background: #0a0a0a;
+            color: #00ff88;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .config-banner {
+            background: linear-gradient(90deg, #ff8800 0%, #ffaa00 100%);
+            color: #000;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .config-banner.show {
+            display: block;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #00ff88 0%, #0088ff 100%);
+            padding: 2px;
+        }
+        
+        .header-content {
+            background: #0a0a0a;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .status-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .status-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .container {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .panel-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .setup-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .input-group input, .input-group select {
+            background: #222;
+            border: 1px solid #444;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        .proxy-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .proxy-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .proxy-option:hover {
+            border-color: #00ff88;
+        }
+        
+        .proxy-option input[type="radio"] {
+            accent-color: #00ff88;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #00ff88 0%, #0088ff 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, #ff4444 0%, #ff6666 100%);
+        }
+        
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .ticker-grid input {
+            background: #222;
+            border: 1px solid #444;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: inherit;
+            text-transform: uppercase;
+        }
+        
+        .watchlist {
+            display: grid;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .ticker-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .ticker-card:hover {
+            border-color: #00ff88;
+            transform: translateX(5px);
+        }
+        
+        .ticker-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .ticker-symbol {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .ticker-name {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .ticker-price {
+            font-size: 16px;
+        }
+        
+        .ticker-change {
+            font-size: 14px;
+        }
+        
+        .ticker-change.positive {
+            color: #00ff88;
+        }
+        
+        .ticker-change.negative {
+            color: #ff4444;
+        }
+        
+        .ticker-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .error {
+            color: #ff4444;
+            padding: 10px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .success {
+            color: #00ff88;
+            padding: 10px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #333;
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .detail-view {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 4px;
+            padding: 20px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .log-panel {
+            grid-column: 1 / -1;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            font-size: 12px;
+            padding: 5px;
+            border-left: 2px solid #333;
+            margin-bottom: 5px;
+        }
+        
+        .log-entry.error {
+            border-left-color: #ff4444;
+            background: rgba(255, 68, 68, 0.05);
+        }
+        
+        .log-entry.success {
+            border-left-color: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .log-entry.warning {
+            border-left-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="config-banner" id="configBanner">
+        ⚠️ Cloudflare Worker URLを設定してください
+    </div>
+    
+    <div class="header">
+        <div class="header-content">
+            <div class="title">🚀 ISP v1.1 - Enhanced Trading System</div>
+            <div class="status">
+                <div class="status-item">
+                    <div class="status-value" id="maintenance">197.45%</div>
+                    <div class="status-label">維持率</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="api-status">⚠️</div>
+                    <div class="status-label">API状態</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="time">--:--:--</div>
+                    <div class="status-label">更新時刻</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="panel">
+            <div class="panel-title">⚙️ システム設定</div>
+            
+            <div class="setup-section">
+                <div class="input-group">
+                    <label>接続方法</label>
+                    <div class="proxy-options">
+                        <label class="proxy-option">
+                            <input type="radio" name="proxy" value="direct">
+                            <span>直接接続（CORS エラーの可能性）</span>
+                        </label>
+                        <label class="proxy-option">
+                            <input type="radio" name="proxy" value="cloudflare" checked>
+                            <span>Cloudflare Worker 経由（推奨）</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="input-group" id="workerUrlGroup">
+                    <label>Cloudflare Worker URL</label>
+                    <input type="text" id="workerUrl" placeholder="https://your-worker.workers.dev" value="https://polygon-proxy.savannanohara.workers.dev">
+                </div>
+                
+                <div class="input-group">
+                    <label>Polygon API Key</label>
+                    <input type="password" id="apiKey" placeholder="APIキーを入力" value="GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6">
+                </div>
+                
+                <button class="btn" onclick="saveConfig()">設定を保存</button>
+                <div id="configMessage"></div>
+            </div>
+            
+            <div class="setup-section">
+                <div class="panel-title">📊 ウォッチリスト</div>
+                <div class="ticker-grid">
+                    <input type="text" id="addTicker" placeholder="銘柄追加 (例: AAPL)">
+                    <button class="btn btn-small" onclick="addToWatchlist()">追加</button>
+                </div>
+                <div class="watchlist" id="watchlist"></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-title">📈 詳細データ</div>
+            <div id="detailView">
+                <div style="text-align: center; opacity: 0.5; padding: 50px;">
+                    ウォッチリストから銘柄を選択してください
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel log-panel">
+            <div class="panel-title">📝 システムログ</div>
+            <div id="logContainer"></div>
+        </div>
+    </div>
+    
+    <script>
+        // ISP v1.1 Enhanced Implementation
+        class EnhancedISP {
+            constructor() {
+                this.config = this.loadConfig();
+                this.watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+                this.cache = new Map();
+                this.logs = [];
+                this.init();
+            }
+            
+            loadConfig() {
+                return {
+                    apiKey: localStorage.getItem('polygon_api_key') || 'GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6',
+                    useProxy: localStorage.getItem('use_proxy') !== 'false',
+                    workerUrl: localStorage.getItem('worker_url') || 'https://polygon-proxy.savannanohara.workers.dev',
+                };
+            }
+            
+            init() {
+                this.updateTime();
+                setInterval(() => this.updateTime(), 1000);
+                
+                // UI初期化
+                this.initializeUI();
+                
+                // 設定確認
+                if (this.config.apiKey) {
+                    this.testConnection();
+                    if (this.watchlist.length === 0) {
+                        this.setDefaultWatchlist();
+                    }
+                    this.refreshWatchlist();
+                }
+                
+                // 自動更新（30秒ごと）
+                setInterval(() => {
+                    if (this.config.apiKey) {
+                        this.refreshWatchlist();
+                    }
+                }, 30000);
+            }
+            
+            initializeUI() {
+                // プロキシ設定の初期化
+                const proxyRadios = document.querySelectorAll('input[name="proxy"]');
+                proxyRadios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const useCloudflare = e.target.value === 'cloudflare';
+                        document.getElementById('workerUrlGroup').style.display = 
+                            useCloudflare ? 'block' : 'none';
+                    });
+                    
+                    if ((radio.value === 'cloudflare' && this.config.useProxy) ||
+                        (radio.value === 'direct' && !this.config.useProxy)) {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event('change'));
+                    }
+                });
+            }
+            
+            updateTime() {
+                const now = new Date();
+                const timeStr = now.toTimeString().split(' ')[0];
+                document.getElementById('time').textContent = timeStr;
+            }
+            
+            log(message, type = 'info') {
+                const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+                const logEntry = { timestamp, message, type };
+                this.logs.unshift(logEntry);
+                this.renderLogs();
+            }
+            
+            renderLogs() {
+                const container = document.getElementById('logContainer');
+                container.innerHTML = this.logs.slice(0, 50).map(log => `
+                    <div class="log-entry ${log.type}">
+                        [${log.timestamp}] ${log.message}
+                    </div>
+                `).join('');
+            }
+            
+            async makeAPICall(endpoint) {
+                let url;
+                const headers = {};
+                
+                if (this.config.useProxy && this.config.workerUrl) {
+                    const baseUrl = this.config.workerUrl.replace(/\/$/, '');
+                    url = `${baseUrl}/api/${endpoint}`;
+                    headers['X-API-Key'] = this.config.apiKey;
+                    headers['Content-Type'] = 'application/json';
+                } else {
+                    url = `https://api.polygon.io/${endpoint}?apiKey=${this.config.apiKey}`;
+                    headers['Content-Type'] = 'application/json';
+                }
+                
+                try {
+                    const response = await fetch(url, { 
+                        method: 'GET',
+                        headers: headers,
+                        mode: 'cors'
+                    });
+                    
+                    const responseText = await response.text();
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error ${response.status}: ${responseText}`);
+                    }
+                    
+                    return JSON.parse(responseText);
+                } catch (error) {
+                    this.log(`詳細エラー: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+            
+            async testConnection() {
+                this.log('API接続テスト開始...', 'info');
+                const statusEl = document.getElementById('api-status');
+                statusEl.textContent = '🔄';
+                
+                this.config = this.loadConfig();
+                
+                if (!this.config.apiKey) {
+                    statusEl.textContent = '❌';
+                    this.log('APIキーが設定されていません', 'error');
+                    return false;
+                }
+                
+                try {
+                    const data = await this.makeAPICall('v2/aggs/ticker/AAPL/prev');
+                    
+                    if (data.status === 'OK') {
+                        statusEl.textContent = '✅';
+                        this.log('API接続成功！', 'success');
+                        return true;
+                    } else {
+                        throw new Error(data.status || 'Unknown error');
+                    }
+                } catch (error) {
+                    statusEl.textContent = '❌';
+                    this.log(`接続エラー: ${error.message}`, 'error');
+                    return false;
+                }
+            }
+            
+            async fetchTickerData(symbol) {
+                try {
+                    const cached = this.cache.get(symbol);
+                    if (cached && Date.now() - cached.timestamp < 60000) {
+                        return cached.data;
+                    }
+                    
+                    const [prevData, detailData] = await Promise.all([
+                        this.makeAPICall(`v2/aggs/ticker/${symbol}/prev`),
+                        this.makeAPICall(`v3/reference/tickers/${symbol}`)
+                    ]);
+                    
+                    const result = {
+                        symbol,
+                        prev: prevData.results?.[0],
+                        detail: detailData.results,
+                        timestamp: Date.now()
+                    };
+                    
+                    this.cache.set(symbol, { data: result, timestamp: Date.now() });
+                    
+                    return result;
+                } catch (error) {
+                    this.log(`${symbol}のデータ取得失敗: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+            
+            async addToWatchlist() {
+                const input = document.getElementById('addTicker');
+                const symbol = input.value.toUpperCase().trim();
+                
+                if (!symbol) return;
+                
+                if (this.watchlist.includes(symbol)) {
+                    this.log(`${symbol}は既にウォッチリストに存在します`, 'warning');
+                    return;
+                }
+                
+                try {
+                    await this.fetchTickerData(symbol);
+                    
+                    this.watchlist.push(symbol);
+                    localStorage.setItem('watchlist', JSON.stringify(this.watchlist));
+                    
+                    this.log(`${symbol}をウォッチリストに追加`, 'success');
+                    input.value = '';
+                    
+                    this.refreshWatchlist();
+                } catch (error) {
+                    this.log(`${symbol}の追加失敗: ${error.message}`, 'error');
+                }
+            }
+            
+            removeFromWatchlist(symbol) {
+                this.watchlist = this.watchlist.filter(s => s !== symbol);
+                localStorage.setItem('watchlist', JSON.stringify(this.watchlist));
+                this.log(`${symbol}をウォッチリストから削除`, 'info');
+                this.refreshWatchlist();
+            }
+            
+            async refreshWatchlist() {
+                const container = document.getElementById('watchlist');
+                
+                if (this.watchlist.length === 0) {
+                    container.innerHTML = '<div style="opacity: 0.5; text-align: center;">銘柄を追加してください</div>';
+                    return;
+                }
+                
+                const cards = await Promise.all(this.watchlist.map(async symbol => {
+                    try {
+                        const data = await this.fetchTickerData(symbol);
+                        const prev = data.prev;
+                        const detail = data.detail;
+                        
+                        const change = prev ? ((prev.c - prev.o) / prev.o * 100).toFixed(2) : 0;
+                        const changeClass = change >= 0 ? 'positive' : 'negative';
+                        const changeSymbol = change >= 0 ? '+' : '';
+                        
+                        return `
+                            <div class="ticker-card" onclick="isp.showDetail('${symbol}')">
+                                <div class="ticker-info">
+                                    <div class="ticker-symbol">${symbol}</div>
+                                    <div class="ticker-name">${detail?.name || ''}</div>
+                                    <div class="ticker-price">$${prev?.c?.toFixed(2) || 'N/A'}</div>
+                                    <div class="ticker-change ${changeClass}">
+                                        ${changeSymbol}${change}%
+                                    </div>
+                                </div>
+                                <div class="ticker-actions">
+                                    <button class="btn btn-small btn-danger" 
+                                            onclick="event.stopPropagation(); isp.removeFromWatchlist('${symbol}')">
+                                        削除
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } catch (error) {
+                        return `
+                            <div class="ticker-card">
+                                <div class="ticker-info">
+                                    <div class="ticker-symbol">${symbol}</div>
+                                    <div class="error">データ取得エラー</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }));
+                
+                container.innerHTML = cards.join('');
+            }
+            
+            async showDetail(symbol) {
+                const container = document.getElementById('detailView');
+                container.innerHTML = '<div class="loading"></div>';
+                
+                try {
+                    const data = await this.fetchTickerData(symbol);
+                    const prev = data.prev;
+                    const detail = data.detail;
+                    
+                    if (!prev) {
+                        throw new Error('データが取得できません');
+                    }
+                    
+                    const change = ((prev.c - prev.o) / prev.o * 100).toFixed(2);
+                    const changeClass = change >= 0 ? 'positive' : 'negative';
+                    
+                    container.innerHTML = `
+                        <div class="detail-view">
+                            <h2>${symbol} - ${detail?.name || ''}</h2>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">現在値</div>
+                                    <div class="detail-value">$${prev.c.toFixed(2)}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">変動率</div>
+                                    <div class="detail-value ${changeClass}">${change >= 0 ? '+' : ''}${change}%</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">出来高</div>
+                                    <div class="detail-value">${prev.v.toLocaleString()}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">高値</div>
+                                    <div class="detail-value">$${prev.h.toFixed(2)}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">安値</div>
+                                    <div class="detail-value">$${prev.l.toFixed(2)}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">始値</div>
+                                    <div class="detail-value">$${prev.o.toFixed(2)}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">時価総額</div>
+                                    <div class="detail-value">
+                                        ${detail?.market_cap ? `$${(detail.market_cap / 1e9).toFixed(2)}B` : 'N/A'}
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">セクター</div>
+                                    <div class="detail-value">${detail?.sic_description || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    this.log(`${symbol}の詳細表示`, 'info');
+                } catch (error) {
+                    container.innerHTML = `<div class="error">エラー: ${error.message}</div>`;
+                }
+            }
+            
+            setDefaultWatchlist() {
+                const defaults = ['AAPL', 'NVDA', 'TSLA', 'MSFT', 'GOOGL'];
+                this.log('推奨銘柄をウォッチリストに追加', 'info');
+                this.watchlist = defaults;
+                localStorage.setItem('watchlist', JSON.stringify(this.watchlist));
+            }
+        }
+        
+        // グローバルインスタンス
+        const isp = new EnhancedISP();
+        
+        // グローバル関数として定義
+        function addToWatchlist() {
+            isp.addToWatchlist();
+        }
+        
+        // 設定保存
+        function saveConfig() {
+            const apiKeyInput = document.getElementById('apiKey');
+            const apiKey = apiKeyInput.value;
+            const useProxy = document.querySelector('input[name="proxy"]:checked').value === 'cloudflare';
+            const workerUrl = document.getElementById('workerUrl').value;
+            
+            if (!apiKey) {
+                document.getElementById('configMessage').innerHTML = 
+                    '<div class="error">APIキーを入力してください</div>';
+                return;
+            }
+            
+            if (useProxy && !workerUrl) {
+                document.getElementById('configMessage').innerHTML = 
+                    '<div class="error">Cloudflare Worker URLを入力してください</div>';
+                return;
+            }
+            
+            // 保存
+            localStorage.setItem('polygon_api_key', apiKey);
+            localStorage.setItem('use_proxy', useProxy);
+            localStorage.setItem('worker_url', workerUrl);
+            
+            // 設定を更新
+            isp.config.apiKey = apiKey;
+            isp.config.useProxy = useProxy;
+            isp.config.workerUrl = workerUrl;
+            
+            isp.log('設定を保存しました', 'success');
+            
+            document.getElementById('configMessage').innerHTML = 
+                '<div class="success">✅ 設定保存完了</div>';
+            
+            // 接続テスト
+            isp.testConnection().then(success => {
+                if (success) {
+                    isp.refreshWatchlist();
+                }
+            });
+        }
+        
+        // エンターキー対応
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('addTicker').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    isp.addToWatchlist();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
