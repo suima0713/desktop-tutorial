@@ -626,7 +626,7 @@
             }
 
             const baseUrl = apiConfig.workerUrl || 'https://api.polygon.io';
-            const endpoint = `${baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true&apiKey=${apiConfig.apiKey}`;
+            const endpoint = `${baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true`;
             
             try {
                 const response = await fetch(endpoint);
@@ -871,3 +871,4 @@
     </script>
 </body>
 </html>
+
