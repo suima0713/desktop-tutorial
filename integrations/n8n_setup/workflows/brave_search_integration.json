@@ -1,0 +1,266 @@
+{
+  "name": "Brave Search MCP統合ワークフロー",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "maintenance-rate-check",
+              "leftValue": "={{ $json.maintenanceRate }}",
+              "rightValue": 180,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "rate-condition",
+      "name": "維持率判定",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Brave Search統合処理\nconst { BraveSearchIntegration } = require('./search_queries');\n\nconst integration = new BraveSearchIntegration();\nconst maintenanceRate = $input.first().json.maintenanceRate;\nconst trend = $input.first().json.trend || 'STABLE';\n\n// 市況要因検索実行\ntry {\n  const searchResult = await integration.searchMarketFactors(maintenanceRate, trend);\n  \n  return {\n    json: {\n      ...$input.first().json,\n      braveSearchResult: searchResult,\n      timestamp: new Date().toISOString()\n    }\n  };\n} catch (error) {\n  console.error('Brave Search統合エラー:', error);\n  \n  return {\n    json: {\n      ...$input.first().json,\n      braveSearchResult: {\n        error: error.message,\n        fallback: true\n      },\n      timestamp: new Date().toISOString()\n    }\n  };\n}"
+      },
+      "id": "brave-search-integration",
+      "name": "Brave Search統合",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// アラート生成処理\nconst input = $input.first().json;\nconst searchResult = input.braveSearchResult;\n\n// アラートレベル判定\nlet alertLevel = 'INFO';\nlet alertMessage = '';\n\nif (input.maintenanceRate < 160) {\n  alertLevel = 'EMERGENCY';\n  alertMessage = '緊急対応が必要です！';\n} else if (input.maintenanceRate < 170) {\n  alertLevel = 'CRITICAL';\n  alertMessage = '重要アラート：リスク軽減が必要です。';\n} else if (input.maintenanceRate < 180) {\n  alertLevel = 'WARNING';\n  alertMessage = '警告：注意レベルです。';\n}\n\n// 市況要因がある場合は追加情報を付与\nif (searchResult && searchResult.marketFactors && searchResult.marketFactors.length > 0) {\n  alertMessage += `\\n\\n検出された市場要因: ${searchResult.marketFactors.length}件`;\n  \n  searchResult.marketFactors.forEach((factor, index) => {\n    alertMessage += `\\n${index + 1}. ${factor.type}: ${factor.title}`;\n  });\n}\n\n// 推奨事項を追加\nif (searchResult && searchResult.recommendations) {\n  alertMessage += '\\n\\n推奨事項:';\n  searchResult.recommendations.forEach((rec, index) => {\n    alertMessage += `\\n${index + 1}. ${rec}`;\n  });\n}\n\nreturn {\n  json: {\n    alertLevel,\n    alertMessage,\n    maintenanceRate: input.maintenanceRate,\n    trend: input.trend,\n    marketFactors: searchResult?.marketFactors || [],\n    recommendations: searchResult?.recommendations || [],\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "alert-generator",
+      "name": "アラート生成",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "alert-level-check",
+              "leftValue": "={{ $json.alertLevel }}",
+              "rightValue": "INFO",
+              "operator": {
+                "type": "string",
+                "operation": "notEqual"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "alert-condition",
+      "name": "アラート判定",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "nodeCredentialType": "n8n-nodes-base.httpHeaderAuth",
+        "url": "https://api.search.brave.com/res/v1/web/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Subscription-Token",
+              "value": "={{ $env.BRAVE_API_KEY }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "moomoo証券 アラート 通知"
+            },
+            {
+              "name": "count",
+              "value": "5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notification-search",
+      "name": "通知検索",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1340, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ログ記録処理\nconst input = $input.first().json;\nconst timestamp = new Date().toISOString();\n\n// ログエントリ作成\nconst logEntry = {\n  timestamp,\n  maintenanceRate: input.maintenanceRate,\n  alertLevel: input.alertLevel,\n  trend: input.trend,\n  marketFactors: input.marketFactors?.length || 0,\n  recommendations: input.recommendations?.length || 0,\n  message: input.alertMessage?.substring(0, 100) + '...'\n};\n\n// ログファイルに追記（実際の実装ではファイルシステムノードを使用）\nconsole.log('ログエントリ:', JSON.stringify(logEntry, null, 2));\n\nreturn {\n  json: {\n    ...input,\n    logEntry,\n    logged: true\n  }\n};"
+      },
+      "id": "log-recorder",
+      "name": "ログ記録",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1780, 200]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "維持率判定",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "維持率判定": {
+      "main": [
+        [
+          {
+            "node": "Brave Search統合",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Brave Search統合": {
+      "main": [
+        [
+          {
+            "node": "アラート生成",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "アラート生成": {
+      "main": [
+        [
+          {
+            "node": "アラート判定",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "アラート判定": {
+      "main": [
+        [
+          {
+            "node": "通知検索",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ログ記録",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ログ記録",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "通知検索": {
+      "main": [
+        [
+          {
+            "node": "ログ記録",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ログ記録": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-08-12T15:30:00.000Z",
+      "updatedAt": "2025-08-12T15:30:00.000Z",
+      "id": "brave-search-integration",
+      "name": "Brave Search MCP統合"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-08-12T15:30:00.000Z",
+  "versionId": "1"
+}

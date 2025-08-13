@@ -1,0 +1,39 @@
+{
+  "brave-search": {
+    "command": "brave-search-mcp",
+    "args": ["--api-key", "$BRAVE_API_KEY"],
+    "env": {
+      "BRAVE_API_KEY": "<実際のAPIキーを設定>"
+    }
+  },
+  "claude-desktop": {
+    "mcp_servers": {
+      "brave-search": {
+        "command": "brave-search-mcp",
+        "args": ["--api-key", "$BRAVE_API_KEY"],
+        "env": {
+          "BRAVE_API_KEY": "<実際のAPIキーを設定>"
+        }
+      }
+    }
+  },
+  "rate_limits": {
+    "queries_per_month": 2000,
+    "max_retries": 3,
+    "fallback_delay": 5000
+  },
+  "search_queries": {
+    "maintenance_rate_decline": [
+      "moomoo証券 障害 メンテナンス 今日",
+      "米国株 急落 原因 速報",
+      "FRB 金利 発表 影響 株価",
+      "証拠金規制 変更 最新"
+    ],
+    "market_analysis": [
+      "維持率 192.63% 影響要因",
+      "moomoo証券 最新ニュース",
+      "米国株式市場 今日 動向"
+    ]
+  }
+}
+
