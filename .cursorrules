@@ -1,0 +1,319 @@
+# TradingSystem2025 - Cursor開発ルール
+
+## 🎯 プロジェクトコンテキスト
+
+### 資産状況（最重要）
+- **総資産**: 1.5億円
+- **信用維持率**: 167.52%（WARNING） → 目標180%
+- **最優先事項**: 維持率の自動監視と改善
+
+### 意思決定の原則
+```
+1. 資産保全 > 収益追求
+2. 大局観重視：1%改善 = 年150万円
+3. 月数千円のコストより運用改善を優先
+4. 自動化できるものは全て自動化
+```
+
+## 💻 技術スタック
+
+### 現在稼働中のシステム
+```yaml
+MCP_Server:
+  port: 3001
+  features: [Brave_Search_API, Health_Check]
+  status: ✅ 稼働中
+
+n8n:
+  port: 5679
+  license: Community_Edition
+  status: ⚠️ オプション
+
+Monitoring:
+  script: auto_monitor_v2.ps1
+  interval: 5分
+  status: ✅ 稼働中
+```
+
+### 利用可能なAPI
+```javascript
+// ✅ 利用可能
+const APIs = {
+  FRED: { status: "FREE", limit: "なし" },
+  AlphaVantage: { key: "6M3ORNF64IKW0G59", limit: "25/day" },
+  BraveSearch: { key: "BSAgAF4UvJOMgxX2ojofxEU47VveSs1", status: "ACTIVE" }
+};
+
+// ❌ 利用不可
+const DONT_USE = {
+  moomoo_API: "存在しない - CSVエクスポートで対応"
+};
+```
+
+## 🔧 実装ルール
+
+### 1. 株価確認（必須遵守）
+```python
+# ❌ 絶対禁止
+def get_stock_price_wrong(symbol):
+    return use_complex_tool_for_simple_price_check()  # 10秒以上かかる
+
+# ✅ 正しい方法
+def get_stock_price(symbol):
+    # Yahoo/Google Finance優先（5秒以内）
+    # 簡潔な確認のみ
+    # 10倍以上の差は異常値として再確認
+    # LNTH失敗例：$71誤報告（実際$54.86）を教訓に
+```
+
+### 2. コスト判断基準
+```python
+def evaluate_cost(monthly_cost):
+    """1.5億円運用におけるコスト評価"""
+    portfolio_value = 150_000_000
+    
+    # 運用額の0.01%未満は自動承認
+    if monthly_cost < portfolio_value * 0.0001:
+        return "即採用"
+    
+    # ROI 3倍以上で承認
+    expected_return = estimate_monthly_return()
+    if expected_return > monthly_cost * 3:
+        return "採用"
+```
+
+### 3. エラーハンドリング
+```python
+try:
+    risky_operation()
+except Exception as e:
+    # 必須3点セット
+    logging.error(f"Operation failed: {e}")
+    send_alert(f"Error: {e}")
+    activate_failsafe()
+```
+
+### 4. コード規約
+```python
+# 命名規則
+i, j, el = 0, 1, element  # 簡潔な変数名
+def fetch_data(): pass     # 動詞_名詞
+THRESHOLD = 180            # 定数は大文字
+
+# コメント
+# 日本語OK、WHY説明、金額は単位明記
+maintenance_rate = 167.52  # %、180%が目標
+```
+
+## 📊 保有ポジション
+
+```json
+{
+  "GBTG": 16000,  // 現物
+  "SEMR": 16400,  // 現物
+  "NVDA": 239,    // 信用 520万円
+  "LNTH": {
+    "現物": 200,
+    "信用": 800,  // 880万円
+    "注意": "価格確認は慎重に"
+  }
+}
+```
+
+## 🚨 リスクレベル
+
+```yaml
+維持率:
+  150%: "追証発生 - 絶対回避"
+  160%: "警告レベル"
+  170%: "注意レベル"
+  180%: "目標値"
+  200%: "安全圏"
+```
+
+## 🎓 実装の教訓
+
+### トラブルシューティング優先順位
+1. **環境変数（.env）**を最初に確認
+2. **依存関係（npm install）**を確実に
+3. **ポート競合**を柔軟に対処（3001, 5679等）
+4. **シンプルから複雑へ**段階的実装
+
+### 成功パターン
+```markdown
+Phase 1: コア機能（MCPサーバー）
+Phase 2: 拡張機能（n8n）※オプション
+Phase 3: 自動化（PowerShellスクリプト）
+```
+
+### アンチパターン回避
+```python
+# ❌ 避けるべき
+- 小額コストに固執（月1000円で悩まない）
+- moomoo APIを探す（存在しない）
+- 完璧主義（動くものを優先）
+- 環境変数なしで起動試行
+
+# ✅ 推奨
+- ROIで判断（3倍以上なら採用）
+- CSV/エクスポートで対応
+- 段階的改善
+- .envファイル最優先
+```
+
+## 📁 プロジェクト構造
+
+```
+TradingSystem2025/
+├── .env                      # 最重要：API Keys
+├── mcp_server.js            # コア：Brave Search統合
+├── auto_monitor_v2.ps1      # 自動監視（5分間隔）
+├── test_final.ps1           # 動作確認
+├── core/
+│   ├── maintenance_monitor.py  # 維持率監視
+│   └── check_rate.py          # レート確認
+├── integrations/
+│   └── brave_integration/     # MCP統合
+└── logs/                     # システムログ
+```
+
+## 🎯 開発時の判断基準
+
+### 新機能実装時の確認事項
+```markdown
+□ 維持率改善に寄与するか？
+□ 自動化可能か？
+□ ROI 3倍以上か？
+□ リスク管理を損なわないか？
+□ テスト可能か？
+```
+
+### デバッグ時の確認順序
+1. `.env`ファイルの存在と内容
+2. `npm install`実行済みか
+3. ポート競合（netstat -ano | findstr :PORT）
+4. MCPサーバー稼働状態（curl http://localhost:3001/health）
+5. ログファイル確認
+
+## 💡 システムKPI
+
+```yaml
+必須監視項目:
+  維持率: "167.52% → 180%（目標）"
+  自動化率: "現在60% → 80%（目標）"
+  エラー率: "< 1%（必須）"
+  応答時間: "< 60秒（SLO）"
+
+ビジネス目標:
+  月間収益率: "2-3%"
+  最大DD: "< 10%"
+  シャープレシオ: "> 1.5"
+```
+
+## 🔐 セキュリティ
+
+```javascript
+// Webhook認証（必須）
+const hmac = crypto.createHmac('sha256', HMAC_SECRET);
+hmac.update(payload);
+const signature = hmac.digest('hex');
+
+// TTL検証（120秒）
+if (Date.now() - timestamp > 120000) {
+  throw new Error('Request expired');
+}
+```
+
+## 📞 外部連携
+
+```yaml
+Webhook_URL: "Google Apps Script（デプロイ済み）"
+通知: Gmail
+開発環境: Cursor Pro（文脈永続化）
+監視: TradingView Premium（年契約済み）
+```
+
+## 🚀 次期実装優先順位
+
+```python
+# Phase 1: 維持率自動改善（今週）
+if maintenance_ratio < 170:
+    suggest_position_reduction()
+if maintenance_ratio < 160:
+    execute_partial_close()
+
+# Phase 2: データ自動取得（来週）
+# moomoo CSV自動ダウンロード
+# Alpha Vantage価格更新
+```
+
+## 📝 コード生成時の注意
+
+1. **常に維持率を意識**したコード生成
+2. **エラーハンドリング**を必ず含める
+3. **ログ出力**を標準装備
+4. **テスト可能**な設計
+5. **段階的実装**を提案
+
+## 🎓 最重要原則
+
+> "1.5億円の運用において、月1,500円で悩むのは木を見て森を見ず"
+> 
+> "完璧な統合より、確実に動く基本機能"
+> 
+> "測定できないものは改善できない"
+
+## 🔍 意思決定基準
+
+### 自動承認条件
+```yaml
+decision_criteria:
+  - Any API < ¥15,000/month: AUTO APPROVE
+  - ROI < 3x: REJECT
+  - Margin trading: REALTIME DATA REQUIRED
+```
+
+### 必須ツール
+```yaml
+mandatory_tools:
+  - Polygon.io: $29/month (必須)
+  - yfinance: バックアップ用のみ
+```
+
+### 禁止事項
+```yaml
+forbidden:
+  - Brave Search for stock prices
+  - Free tool bias when ROI > 3x
+```
+
+## 🧠 システムメモリ統合
+
+### 新規セッション開始時の自動実行
+```python
+# startup_context.py - 毎回実行
+def load_context():
+    """新規セッション開始時に必ず実行"""
+    with open('SYSTEM_MEMORY.md', 'r') as f:
+        memory = f.read()
+    
+    print(f"""
+    === CONTEXT LOADED ===
+    {memory}
+    
+    TODAY'S PRIORITY:
+    1. Maintenance rate to 180%
+    2. Polygon.io integration
+    3. Never repeat LNTH incident
+    """)
+
+# 判断記録システム
+def record_decision(action, result):
+    with open('SYSTEM_MEMORY.md', 'a') as f:
+        f.write(f"\n- [{datetime.now()}] {action}: {result}")
+```
+
+---
+
+このルールに従い、常に大局的視点を保ちながら、
+実用的で保守可能なコードを生成します。

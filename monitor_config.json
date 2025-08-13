@@ -1,0 +1,64 @@
+{
+  "positions": [
+    {
+      "ticker": "AAPL",
+      "shares": 100,
+      "description": "Apple Inc."
+    },
+    {
+      "ticker": "GOOGL",
+      "shares": 50,
+      "description": "Alphabet Inc."
+    },
+    {
+      "ticker": "MSFT",
+      "shares": 75,
+      "description": "Microsoft Corporation"
+    },
+    {
+      "ticker": "TSLA",
+      "shares": 25,
+      "description": "Tesla Inc."
+    },
+    {
+      "ticker": "NVDA",
+      "shares": 30,
+      "description": "NVIDIA Corporation"
+    },
+    {
+      "ticker": "AMZN",
+      "shares": 40,
+      "description": "Amazon.com Inc."
+    },
+    {
+      "ticker": "META",
+      "shares": 35,
+      "description": "Meta Platforms Inc."
+    }
+  ],
+  "targetRate": 180,
+  "marginUsed": 14000000,
+  "alertThreshold": 160,
+  "emergencyThreshold": 150,
+  "totalCapital": 150000000,
+  "monitoring": {
+    "intervalMinutes": 5,
+    "enableAlerts": true,
+    "enableLogging": true,
+    "logFile": "maintenance_monitor.log"
+  },
+  "notifications": {
+    "email": {
+      "enabled": false,
+      "recipients": []
+    },
+    "slack": {
+      "enabled": false,
+      "webhookUrl": ""
+    },
+    "line": {
+      "enabled": false,
+      "token": ""
+    }
+  }
+}

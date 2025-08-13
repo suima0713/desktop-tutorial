@@ -1,0 +1,32 @@
+system:
+  name: TradingSystem2025
+  version: '2.0'
+  mode: safe
+maintenance_levels:
+  excellent: 190
+  good: 180
+  warning: 170
+  danger: 150
+  critical: 100
+monitoring_intervals:
+  excellent: 1800
+  good: 900
+  warning: 300
+  danger: 60
+  critical: 30
+alerts:
+  slack_enabled: false
+  email_enabled: false
+  sound_enabled: true
+trading_rules:
+  max_position_size: 0.1
+  stop_loss: 0.05
+  take_profit: 0.15
+polygon_api:
+  key: GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6
+  fallback_to_yahoo: true
+  cache_duration: 60
+current_status:
+  maintenance_rate: 197.45
+  last_update: '2025-08-13T00:57:24.372Z'
+  next_check: '2025-08-13T01:27:24.372Z'
