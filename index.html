@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading System 2025 - AI-Human Fusion</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX', {
+            page_title: 'Trading System 2025 - AI-Human Fusion',
+            custom_map: {
+                'custom_parameter_1': 'system_voice_level',
+                'custom_parameter_2': 'api_response_time',
+                'custom_parameter_3': 'error_type'
+            }
+        });
+    </script>
     <style>
         * {
             margin: 0;
@@ -280,14 +296,170 @@
                 </div>
             </div>
         </div>
+        
+        <!-- インサイトパネル -->
+        <div class="insights-panel" style="
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        ">
+            <h3 style="margin-top: 0;">📈 マーケットインサイト</h3>
+            <div id="insights-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <!-- 動的に生成 -->
+            </div>
+        </div>
     </div>
 
+    <!-- アラート設定モーダル -->
+    <div id="alert-modal" style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 10001;
+        min-width: 300px;
+    ">
+        <h3>価格アラート設定</h3>
+        <select id="alert-symbol" style="width: 100%; padding: 8px; margin: 10px 0;">
+            <option value="AAPL">AAPL</option>
+            <option value="NVDA">NVDA</option>
+            <option value="TSLA">TSLA</option>
+            <option value="MSFT">MSFT</option>
+            <option value="GOOGL">GOOGL</option>
+        </select>
+        <select id="alert-type" style="width: 100%; padding: 8px; margin: 10px 0;">
+            <option value="above">価格以上</option>
+            <option value="below">価格以下</option>
+        </select>
+        <input type="number" id="alert-threshold" placeholder="価格 ($)" 
+               style="width: 100%; padding: 8px; margin: 10px 0;">
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button onclick="setAlert()" style="flex: 1;">設定</button>
+            <button onclick="closeAlertModal()" style="flex: 1; background: #6b7280;">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- アラート設定ボタン -->
+    <button onclick="openAlertModal()" style="
+        position: fixed;
+        bottom: 60px;
+        left: 10px;
+        padding: 10px 20px;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 9999;
+    ">
+        🔔 アラート設定
+    </button>
+
     <script>
+        // Google Analytics統合
+        const AnalyticsTracker = {
+            config: {
+                measurementId: 'G-XXXXXXXXXX',
+                enabled: true,
+                debug: true
+            },
+
+            trackEvent: (eventName, parameters = {}) => {
+                if (!window.gtag || !this.config.enabled) {
+                                    // console.log(`[GA] gtag not available or disabled`);
+                return;
+                }
+                
+                try {
+                    gtag('event', eventName, {
+                        ...parameters,
+                        timestamp: Date.now(),
+                        session_id: this.getSessionId()
+                    });
+                    
+                    if (this.config.debug) {
+                        // console.log(`[GA] Tracked: ${eventName}`, parameters);
+                    }
+                } catch (error) {
+                    console.error('[GA] Error tracking event:', error);
+                }
+            },
+
+            getSessionId: () => {
+                if (!localStorage.getItem('ga_session_id')) {
+                    localStorage.setItem('ga_session_id', Date.now().toString());
+                }
+                return localStorage.getItem('ga_session_id');
+            },
+
+            trackAPI: (symbol, success, responseTime, error = null) => {
+                this.trackEvent('api_call', {
+                    symbol: symbol,
+                    success: success,
+                    response_time: responseTime,
+                    error_type: error ? error.type : null,
+                    error_message: error ? error.message : null
+                });
+            },
+
+            trackError: (errorType, errorMessage, context = {}) => {
+                this.trackEvent('error', {
+                    error_type: errorType,
+                    error_message: errorMessage,
+                    context: JSON.stringify(context),
+                    url: window.location.href,
+                    user_agent: navigator.userAgent
+                });
+            },
+
+            trackUserAction: (action, details = {}) => {
+                this.trackEvent('user_action', {
+                    action: action,
+                    ...details
+                });
+            },
+
+            trackSession: (action) => {
+                this.trackEvent('session', {
+                    action: action,
+                    session_duration: this.getSessionDuration()
+                });
+            },
+
+            getSessionDuration: () => {
+                const startTime = localStorage.getItem('session_start_time') || Date.now();
+                return Date.now() - startTime;
+            }
+        };
+
+        // localStorageの使用量確認
+        function checkStorageUsage() {
+            let totalSize = 0;
+            for(let key in localStorage) {
+                if(localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            console.log(`localStorage使用量: ${(totalSize / 1024).toFixed(2)} KB`);
+            
+            // 4MB制限の警告
+            if (totalSize > 4 * 1024 * 1024) {
+                SystemVoice.speak('ストレージ容量が不足しています', 'warning');
+            }
+        }
+
         // SystemVoice 機能の実装
         const SystemVoice = {
             speak: function(message, level = 'info') {
                 // 1. コンソールに記録
-                console.log(`[System ${level.toUpperCase()}]: ${message}`);
+                // console.log(`[System ${level.toUpperCase()}]: ${message}`);
                 
                 // 2. 画面上に通知表示
                 const notification = document.createElement('div');
@@ -316,6 +488,14 @@
                 
                 // 5. メッセージの自動削除（古いメッセージを削除）
                 this.cleanupOldMessages();
+                
+                // 6. Google Analytics連携
+                if (AnalyticsTracker && AnalyticsTracker.config.enabled) {
+                    AnalyticsTracker.trackEvent('system_voice', {
+                        message: message,
+                        level: level
+                    });
+                }
             },
 
             cleanupOldMessages: function() {
@@ -361,6 +541,9 @@
 
         // ページ読み込み時の初期化
         document.addEventListener('DOMContentLoaded', function() {
+            // Google Analytics連携
+            AnalyticsTracker.trackSession('start');
+            
             SystemVoice.speak('Trading System 2025 が起動しました', 'success');
             SystemVoice.speak('SystemVoice機能が初期化されました', 'info');
             SystemVoice.loadHistory();
@@ -371,6 +554,9 @@
 
         // テスト関数
         function testSystemVoice() {
+            // Google Analytics連携
+            AnalyticsTracker.trackUserAction('test_system_voice', { test_type: 'comprehensive' });
+            
             SystemVoice.speak('音声テスト: システムは正常に動作しています', 'info');
             SystemVoice.speak('警告テスト: API制限に近づいています', 'warning');
             SystemVoice.speak('エラーテスト: 接続エラーが発生しました', 'error');
@@ -378,6 +564,9 @@
         }
 
         function startMonitoring() {
+            // Google Analytics連携
+            AnalyticsTracker.trackUserAction('start_monitoring', { action: 'monitoring_start' });
+            
             SystemVoice.speak('監視システムを開始します', 'info');
             SystemVoice.updateStatus('online', '監視システムが開始されました');
             
@@ -392,11 +581,17 @@
         }
 
         function stopMonitoring() {
+            // Google Analytics連携
+            AnalyticsTracker.trackUserAction('stop_monitoring', { action: 'monitoring_stop' });
+            
             SystemVoice.speak('監視システムを停止します', 'warning');
             SystemVoice.updateStatus('offline', '監視システムが停止されました');
         }
 
         function clearMessages() {
+            // Google Analytics連携
+            AnalyticsTracker.trackUserAction('clear_messages', { action: 'messages_cleared' });
+            
             document.getElementById('system-messages').innerHTML = '';
             localStorage.removeItem('systemLog');
             SystemVoice.speak('メッセージ履歴をクリアしました', 'info');
@@ -409,11 +604,21 @@
 
         // エラーハンドリング
         window.addEventListener('error', function(e) {
+            // Google Analytics連携
+            AnalyticsTracker.trackError('javascript_error', e.message, {
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno
+            });
+            
             SystemVoice.speak(`JavaScriptエラー: ${e.message}`, 'error');
         });
 
         // ページ離脱時の処理
         window.addEventListener('beforeunload', function() {
+            // Google Analytics連携
+            AnalyticsTracker.trackSession('end');
+            
             SystemVoice.speak('システムを終了します', 'info');
         });
     </script>
@@ -889,6 +1094,38 @@
                 </div>
             </div>
 
+            <!-- 統計ダッシュボード -->
+            <div id="stats-dashboard" style="
+                position: fixed;
+                top: 200px;
+                right: 10px;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                min-width: 200px;
+                font-size: 12px;
+                z-index: 1000;
+            ">
+                <h4 style="margin: 0 0 10px 0; color: #333;">📊 統計情報</h4>
+                <div class="stat-row" style="margin-bottom: 5px;">
+                    <span>総APIコール:</span>
+                    <strong id="total-api-calls">0</strong>
+                </div>
+                <div class="stat-row" style="margin-bottom: 5px;">
+                    <span>成功率:</span>
+                    <strong id="success-rate">100%</strong>
+                </div>
+                <div class="stat-row" style="margin-bottom: 5px;">
+                    <span>平均応答時間:</span>
+                    <strong id="avg-response">0ms</strong>
+                </div>
+                <div class="stat-row" style="margin-bottom: 5px;">
+                    <span>最頻銘柄:</span>
+                    <strong id="top-symbol">-</strong>
+                </div>
+            </div>
+
             <div class="controls">
                 <div class="control-group">
                     <input type="text" id="tickerInput" placeholder="ティッカーシンボル (例: AAPL)" onkeypress="handleKeyPress(event)">
@@ -902,6 +1139,20 @@
 
             <div id="tickerGrid" class="ticker-grid"></div>
             <div id="errorMessage"></div>
+
+            <!-- 設定管理セクション -->
+            <div class="settings-section" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <h3>設定管理</h3>
+                <div class="settings-controls" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="SettingsManager.exportSettings()" style="background: #4ade80; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">📥 設定をエクスポート</button>
+                    <label for="importFile" style="cursor: pointer;">
+                        <button onclick="document.getElementById('importFile').click()" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">📤 設定をインポート</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" 
+                               onchange="SettingsManager.importSettings(this.files[0])">
+                    </label>
+                    <button onclick="SettingsManager.resetSettings()" style="background: #ff6b6b; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">🔄 リセット</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1041,17 +1292,19 @@
             }
         }
 
-        // APIリクエスト関数
+        // APIリクエスト関数（ErrorHandler統合版）
         async function fetchTickerData(symbol) {
-            if (!apiConfig) {
-                throw new Error('API設定が見つかりません');
-            }
+            const startTime = Date.now();
+            
+            return ErrorHandler.withRetry(async () => {
+                if (!apiConfig) {
+                    throw new Error('API設定が見つかりません');
+                }
 
-            // Cloudflare Worker経由でリクエスト（APIキーはWorker側で追加）
-            const baseUrl = apiConfig.workerUrl || 'https://api.polygon.io';
-            const endpoint = `${baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true`;
+                // Cloudflare Worker経由でリクエスト（APIキーはWorker側で追加）
+                const baseUrl = apiConfig.workerUrl || 'https://api.polygon.io';
+                const endpoint = `${baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true`;
 
-            try {
                 const response = await fetch(endpoint);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1059,14 +1312,30 @@
                 const data = await response.json();
 
                 if (data.status === 'OK' && data.results && data.results.length > 0) {
-                    return data.results[0];
+                    const responseTime = Date.now() - startTime;
+                    recordApiCall(symbol, true, responseTime);
+                    const result = data.results[0];
+                    
+                    // トレンド分析に価格を記録
+                    if (typeof TrendAnalyzer !== 'undefined') {
+                        TrendAnalyzer.recordPrice(symbol, result.c);
+                    }
+                    
+                    // アラートチェック
+                    if (typeof AlertManager !== 'undefined') {
+                        AlertManager.checkAlerts(symbol, result.c);
+                    }
+                    
+                    return result;
                 } else {
                     throw new Error('データが見つかりません');
                 }
-            } catch (error) {
-                console.error(`Error fetching ${symbol}:`, error);
+            }, { symbol }).catch(error => {
+                const responseTime = Date.now() - startTime;
+                recordApiCall(symbol, false, responseTime);
+                ErrorHandler.logError(error, { symbol, endpoint });
                 throw error;
-            }
+            });
         }
 
         // ティッカー追加
@@ -1272,8 +1541,72 @@
             }
         }
 
+        // 統計情報の更新
+        function updateStats() {
+            const stats = JSON.parse(localStorage.getItem('tradingStats') || '{}');
+            document.getElementById('total-api-calls').textContent = stats.totalCalls || 0;
+            document.getElementById('success-rate').textContent = stats.successRate || '100%';
+            document.getElementById('avg-response').textContent = stats.avgResponse || '0ms';
+            document.getElementById('top-symbol').textContent = stats.topSymbol || '-';
+        }
+
+        // 統計情報の記録
+        function recordApiCall(symbol, success, responseTime) {
+            const stats = JSON.parse(localStorage.getItem('tradingStats') || '{}');
+            stats.totalCalls = (stats.totalCalls || 0) + 1;
+            
+            if (success) {
+                stats.successfulCalls = (stats.successfulCalls || 0) + 1;
+            }
+            
+            stats.successRate = Math.round((stats.successfulCalls / stats.totalCalls) * 100) + '%';
+            stats.avgResponse = Math.round((stats.avgResponse || 0) * 0.9 + responseTime * 0.1) + 'ms';
+            
+            // 最頻銘柄の更新
+            stats.symbolCounts = stats.symbolCounts || {};
+            stats.symbolCounts[symbol] = (stats.symbolCounts[symbol] || 0) + 1;
+            stats.topSymbol = Object.keys(stats.symbolCounts).reduce((a, b) => 
+                stats.symbolCounts[a] > stats.symbolCounts[b] ? a : b
+            );
+            
+            localStorage.setItem('tradingStats', JSON.stringify(stats));
+            updateStats();
+        }
+
+        // アラート関連の関数
+        function openAlertModal() {
+            document.getElementById('alert-modal').style.display = 'block';
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alert-modal').style.display = 'none';
+        }
+
+        function setAlert() {
+            const symbol = document.getElementById('alert-symbol').value;
+            const type = document.getElementById('alert-type').value;
+            const threshold = parseFloat(document.getElementById('alert-threshold').value);
+            
+            if (threshold && !isNaN(threshold)) {
+                AlertManager.setAlert(symbol, type, threshold);
+                closeAlertModal();
+            } else {
+                alert('有効な価格を入力してください');
+            }
+        }
+
         // 初期化
         window.addEventListener('DOMContentLoaded', async () => {
+            // 通知権限リクエスト
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            // アラート読み込み
+            if (typeof AlertManager !== 'undefined') {
+                AlertManager.loadAlerts();
+            }
+
             // 既存の設定があるか確認
             const config = localStorage.getItem('ispTradingConfig');
             if (config) {
@@ -1283,6 +1616,9 @@
             } else {
                 showSetupScreen();
             }
+            
+            // 統計情報の初期化
+            updateStats();
         });
 
         // ページ離脱時の処理
@@ -1292,5 +1628,16 @@
             }
         });
     </script>
+    
+    <!-- Phase 1実装モジュール -->
+    <script src="js/settings-manager.js"></script>
+    <script src="js/error-handler.js"></script>
+    
+    <!-- Phase 2実装モジュール -->
+    <script src="js/trend-analyzer.js"></script>
+    <script src="js/alert-manager.js"></script>
+    
+    <!-- システムテストスクリプト -->
+    <script src="test/system-test.js"></script>
 </body>
 </html>

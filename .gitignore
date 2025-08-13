@@ -183,3 +183,12 @@ reports/
 # VS Code
 /.vscode/*
 !/.vscode/settings.json
+
+# 緊急修正スクリプト（不要）
+fix_git_pager.*
+*_REPORT.md
+*_ACTION_PLAN.md
+
+# 一時ファイル
+*.tmp
+*.bak

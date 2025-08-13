@@ -99,6 +99,49 @@ Content-Type: application/json
 }
 ```
 
+## 🎯 ISP Trading System v2.0
+
+### Phase 1 - 基盤機能
+- ✅ リアルタイム株価監視（5銘柄）
+- ✅ 設定の永続化（エクスポート/インポート）
+- ✅ エラー自動リトライ
+- ✅ 統計ダッシュボード
+- ✅ SystemVoice（対話機能）
+
+### Phase 2 - インテリジェンス機能
+- ✅ 価格トレンド分析（SMA20）
+- ✅ リアルタイムトレンド判定
+- ✅ 異常検知システム
+- ✅ 価格アラート機能
+- ✅ マーケットインサイトパネル
+
+### 統合機能
+- ✅ Google Analytics統合
+- ✅ Cloudflare Worker（CORS回避）
+- ✅ GitHub Pages自動デプロイ
+
+### 技術スタック
+- Frontend: Vanilla JS + HTML5 + CSS3
+- Analytics: Google Analytics 4
+- Hosting: GitHub Pages
+- API: Polygon.io
+- Proxy: Cloudflare Workers
+
+### セットアップ
+1. APIキーを取得（Polygon.io）
+2. サイトにアクセス
+3. APIキーを設定
+4. 監視開始
+
+### 使用方法
+- 設定管理：左下の⚙️ボタン
+- アラート設定：左下の🔔ボタン
+- 統計確認：右上のダッシュボード
+
+### 今後の展望
+- Phase 3: 自動化拡張（GitHub Actions）
+- Phase 4: AI予測統合
+
 ### テストAPI
 ```http
 GET http://localhost:3001/test

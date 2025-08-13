@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Analytics統合テスト - ISP Trading System</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX', {
+            page_title: 'GA Test - ISP Trading System v1.3',
+            custom_map: {
+                'custom_parameter_1': 'system_voice_level',
+                'custom_parameter_2': 'api_response_time',
+                'custom_parameter_3': 'error_type'
+            }
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2a5298;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .test-section h3 {
+            color: #2a5298;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 10px;
+        }
+
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+        }
+
+        .btn.warning {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .btn.error {
+            background: linear-gradient(135deg, #ff4757 0%, #c44569 100%);
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-success {
+            background: #4CAF50;
+        }
+
+        .status-error {
+            background: #F44336;
+        }
+
+        .status-warning {
+            background: #FF9800;
+        }
+
+        .test-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .result-card h4 {
+            color: #2a5298;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Google Analytics統合テスト</h1>
+        
+        <!-- AnalyticsTracker実装 -->
+        <script>
+            const AnalyticsTracker = {
+                config: {
+                    measurementId: 'G-XXXXXXXXXX',
+                    enabled: true,
+                    debug: true
+                },
+
+                trackEvent: (eventName, parameters = {}) => {
+                    if (!window.gtag || !this.config.enabled) {
+                        this.log(`[GA] gtag not available or disabled`);
+                        return;
+                    }
+                    
+                    try {
+                        gtag('event', eventName, {
+                            ...parameters,
+                            timestamp: Date.now(),
+                            session_id: this.getSessionId()
+                        });
+                        
+                        if (this.config.debug) {
+                            this.log(`[GA] Tracked: ${eventName}`, parameters);
+                        }
+                    } catch (error) {
+                        this.log(`[GA] Error tracking event: ${error.message}`);
+                    }
+                },
+
+                getSessionId: () => {
+                    if (!localStorage.getItem('ga_session_id')) {
+                        localStorage.setItem('ga_session_id', Date.now().toString());
+                    }
+                    return localStorage.getItem('ga_session_id');
+                },
+
+                trackAPI: (symbol, success, responseTime, error = null) => {
+                    this.trackEvent('api_call', {
+                        symbol: symbol,
+                        success: success,
+                        response_time: responseTime,
+                        error_type: error ? error.type : null,
+                        error_message: error ? error.message : null
+                    });
+                },
+
+                trackError: (errorType, errorMessage, context = {}) => {
+                    this.trackEvent('error', {
+                        error_type: errorType,
+                        error_message: errorMessage,
+                        context: JSON.stringify(context),
+                        url: window.location.href,
+                        user_agent: navigator.userAgent
+                    });
+                },
+
+                trackUserAction: (action, details = {}) => {
+                    this.trackEvent('user_action', {
+                        action: action,
+                        ...details
+                    });
+                },
+
+                trackSession: (action) => {
+                    this.trackEvent('session', {
+                        action: action,
+                        session_duration: this.getSessionDuration()
+                    });
+                },
+
+                getSessionDuration: () => {
+                    const startTime = localStorage.getItem('session_start_time') || Date.now();
+                    return Date.now() - startTime;
+                },
+
+                log: (message, data = null) => {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const logMessage = `[${timestamp}] ${message}`;
+                    console.log(logMessage, data);
+                    
+                    const logContainer = document.getElementById('log-container');
+                    if (logContainer) {
+                        const logEntry = document.createElement('div');
+                        logEntry.textContent = logMessage;
+                        logContainer.appendChild(logEntry);
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
+                }
+            };
+
+            // セッション開始
+            window.addEventListener('load', () => {
+                AnalyticsTracker.trackSession('start');
+                AnalyticsTracker.log('AnalyticsTracker initialized');
+            });
+        </script>
+
+        <!-- 基本動作テスト -->
+        <div class="test-section">
+            <h3>🔧 基本動作テスト</h3>
+            <div class="test-buttons">
+                <button class="btn" onclick="testGATag()">Google Analyticsタグ確認</button>
+                <button class="btn" onclick="testAnalyticsTracker()">AnalyticsTracker初期化確認</button>
+                <button class="btn" onclick="testSessionTracking()">セッション追跡テスト</button>
+            </div>
+            <div class="test-results" id="basic-test-results"></div>
+        </div>
+
+        <!-- イベント追跡テスト -->
+        <div class="test-section">
+            <h3>📊 イベント追跡テスト</h3>
+            <div class="test-buttons">
+                <button class="btn success" onclick="testAPIEvent()">API呼び出しイベント</button>
+                <button class="btn warning" onclick="testErrorEvent()">エラーイベント</button>
+                <button class="btn" onclick="testUserAction()">ユーザーアクション</button>
+                <button class="btn" onclick="testSystemVoice()">SystemVoiceイベント</button>
+            </div>
+            <div class="test-results" id="event-test-results"></div>
+        </div>
+
+        <!-- パフォーマンステスト -->
+        <div class="test-section">
+            <h3>⚡ パフォーマンステスト</h3>
+            <div class="test-buttons">
+                <button class="btn" onclick="testPerformance()">パフォーマンス測定</button>
+                <button class="btn" onclick="testMemoryUsage()">メモリ使用量確認</button>
+                <button class="btn" onclick="testConcurrentEvents()">同時イベント処理</button>
+            </div>
+            <div class="test-results" id="performance-test-results"></div>
+        </div>
+
+        <!-- ログ表示 -->
+        <div class="test-section">
+            <h3>📝 テストログ</h3>
+            <div class="log-container" id="log-container">
+                <!-- ログがここに表示されます -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // テスト関数
+        function testGATag() {
+            const result = document.getElementById('basic-test-results');
+            const status = window.gtag ? 'success' : 'error';
+            const message = window.gtag ? 'Google Analyticsタグが正常に読み込まれています' : 'Google Analyticsタグが読み込まれていません';
+            
+            result.innerHTML = `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-${status}"></span>Google Analyticsタグ</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            AnalyticsTracker.log(`GA Tag Test: ${message}`);
+        }
+
+        function testAnalyticsTracker() {
+            const result = document.getElementById('basic-test-results');
+            const status = AnalyticsTracker ? 'success' : 'error';
+            const message = AnalyticsTracker ? 'AnalyticsTrackerが正常に初期化されています' : 'AnalyticsTrackerの初期化に失敗しました';
+            
+            result.innerHTML += `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-${status}"></span>AnalyticsTracker</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            AnalyticsTracker.log(`AnalyticsTracker Test: ${message}`);
+        }
+
+        function testSessionTracking() {
+            const result = document.getElementById('basic-test-results');
+            const sessionId = AnalyticsTracker.getSessionId();
+            const duration = AnalyticsTracker.getSessionDuration();
+            
+            result.innerHTML += `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-success"></span>セッション追跡</h4>
+                    <p>セッションID: ${sessionId}</p>
+                    <p>セッション時間: ${Math.round(duration / 1000)}秒</p>
+                </div>
+            `;
+            
+            AnalyticsTracker.trackSession('test');
+            AnalyticsTracker.log(`Session Tracking Test: Session ID ${sessionId}`);
+        }
+
+        function testAPIEvent() {
+            const result = document.getElementById('event-test-results');
+            const startTime = Date.now();
+            
+            // シミュレートされたAPI呼び出し
+            setTimeout(() => {
+                const responseTime = Date.now() - startTime;
+                AnalyticsTracker.trackAPI('AAPL', true, responseTime);
+                
+                result.innerHTML = `
+                    <div class="result-card">
+                        <h4><span class="status-indicator status-success"></span>API呼び出しイベント</h4>
+                        <p>シンボル: AAPL</p>
+                        <p>成功: true</p>
+                        <p>応答時間: ${responseTime}ms</p>
+                    </div>
+                `;
+            }, 100);
+        }
+
+        function testErrorEvent() {
+            const result = document.getElementById('event-test-results');
+            const errorMessage = 'テスト用のエラーメッセージ';
+            
+            AnalyticsTracker.trackError('test_error', errorMessage, { test: true });
+            
+            result.innerHTML = `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-warning"></span>エラーイベント</h4>
+                    <p>エラータイプ: test_error</p>
+                    <p>メッセージ: ${errorMessage}</p>
+                </div>
+            `;
+        }
+
+        function testUserAction() {
+            const result = document.getElementById('event-test-results');
+            
+            AnalyticsTracker.trackUserAction('test_button_click', { button_id: 'test-btn' });
+            
+            result.innerHTML = `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-success"></span>ユーザーアクション</h4>
+                    <p>アクション: test_button_click</p>
+                    <p>ボタンID: test-btn</p>
+                </div>
+            `;
+        }
+
+        function testSystemVoice() {
+            const result = document.getElementById('event-test-results');
+            
+            AnalyticsTracker.trackEvent('system_voice', {
+                message: 'テストメッセージ',
+                level: 'info'
+            });
+            
+            result.innerHTML = `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-success"></span>SystemVoiceイベント</h4>
+                    <p>メッセージ: テストメッセージ</p>
+                    <p>レベル: info</p>
+                </div>
+            `;
+        }
+
+        function testPerformance() {
+            const result = document.getElementById('performance-test-results');
+            const startTime = performance.now();
+            
+            // 複数のイベントを連続で送信
+            for (let i = 0; i < 10; i++) {
+                AnalyticsTracker.trackEvent('performance_test', { iteration: i });
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            result.innerHTML = `
+                <div class="result-card">
+                    <h4><span class="status-indicator status-success"></span>パフォーマンス測定</h4>
+                    <p>10イベント送信時間: ${duration.toFixed(2)}ms</p>
+                    <p>平均時間: ${(duration / 10).toFixed(2)}ms/イベント</p>
+                </div>
+            `;
+        }
+
+        function testMemoryUsage() {
+            const result = document.getElementById('performance-test-results');
+            
+            if (performance.memory) {
+                const memory = performance.memory;
+                result.innerHTML = `
+                    <div class="result-card">
+                        <h4><span class="status-indicator status-success"></span>メモリ使用量</h4>
+                        <p>使用中: ${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB</p>
+                        <p>合計: ${Math.round(memory.totalJSHeapSize / 1024 / 1024)}MB</p>
+                        <p>制限: ${Math.round(memory.jsHeapSizeLimit / 1024 / 1024)}MB</p>
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `
+                    <div class="result-card">
+                        <h4><span class="status-indicator status-warning"></span>メモリ使用量</h4>
+                        <p>メモリ情報が利用できません</p>
+                    </div>
+                `;
+            }
+        }
+
+        function testConcurrentEvents() {
+            const result = document.getElementById('performance-test-results');
+            const promises = [];
+            
+            // 同時に10個のイベントを送信
+            for (let i = 0; i < 10; i++) {
+                promises.push(new Promise(resolve => {
+                    setTimeout(() => {
+                        AnalyticsTracker.trackEvent('concurrent_test', { id: i });
+                        resolve(i);
+                    }, Math.random() * 100);
+                }));
+            }
+            
+            Promise.all(promises).then(() => {
+                result.innerHTML = `
+                    <div class="result-card">
+                        <h4><span class="status-indicator status-success"></span>同時イベント処理</h4>
+                        <p>10個の同時イベントが正常に処理されました</p>
+                    </div>
+                `;
+            });
+        }
+
+        // ページ読み込み時の初期化
+        window.addEventListener('load', () => {
+            AnalyticsTracker.log('テストページが読み込まれました');
+            AnalyticsTracker.trackSession('start');
+        });
+    </script>
+</body>
+</html>
