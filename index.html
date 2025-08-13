@@ -463,6 +463,39 @@
     // ページロード時のトラッキング
     AnalyticsTracker.trackEvent('Session', 'start', new Date().toISOString());
     </script>
+    <!-- Analytics Integration -->
+    <script>
+    // Google Analytics Events
+    if (typeof gtag === 'function') {
+        // Initial page view
+        gtag('event', 'page_view', {
+            page_title: 'ISP Trading System',
+            page_location: window.location.href
+        });
+    
+        // Track SystemVoice messages
+        const originalSystemSpeak = SystemVoice.speak;
+        SystemVoice.speak = function(message, level) {
+            originalSystemSpeak.call(this, message, level);
+            if (typeof gtag === 'function') {
+                gtag('event', 'system_log', {
+                    'event_category': 'System',
+                    'event_label': level,
+                    'value': message
+                });
+            }
+        };
+    
+        console.log('[GA] Google Analytics initialized successfully');
+    } else {
+        console.log('[GA] Waiting for gtag to load...');
+        setTimeout(() => {
+            if (typeof gtag === 'function') {
+                console.log('[GA] Google Analytics loaded');
+            }
+        }, 2000);
+    }
+    </script>
 </body>
 </html>
 =======
