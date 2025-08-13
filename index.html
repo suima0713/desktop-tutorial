@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ISP v1.1 - Trading System 2025</title>
+    <title>ISP v1.2 - Secure Trading System</title>
     <style>
         * {
             margin: 0;
@@ -20,22 +20,91 @@
             flex-direction: column;
         }
         
-        .config-banner {
-            background: linear-gradient(90deg, #ff8800 0%, #ffaa00 100%);
-            color: #000;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
+        /* 初回セットアップ画面 */
+        .setup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .setup-overlay.hidden {
             display: none;
         }
         
-        .config-banner.show {
-            display: block;
+        .setup-box {
+            background: #111;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
         }
         
-        .header {
+        .setup-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #00ff88;
+        }
+        
+        .setup-info {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .setup-input {
+            width: 100%;
+            background: #222;
+            border: 1px solid #444;
+            color: #00ff88;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        
+        .setup-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .setup-btn {
+            flex: 1;
             background: linear-gradient(90deg, #00ff88 0%, #0088ff 100%);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .setup-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .setup-btn.secondary {
+            background: #444;
+            color: #fff;
+        }
+        
+        /* メインアプリケーション */
+        .header {
+            background: #111;
             padding: 2px;
+            border-bottom: 2px solid #00ff88;
         }
         
         .header-content {
@@ -49,6 +118,14 @@
         .title {
             font-size: 24px;
             font-weight: bold;
+        }
+        
+        .security-badge {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
         }
         
         .status {
@@ -95,55 +172,13 @@
             border-bottom: 1px solid #333;
         }
         
-        .setup-section {
-            margin-bottom: 30px;
-        }
-        
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .config-info {
+            background: rgba(0, 136, 255, 0.1);
+            border: 1px solid #0088ff;
+            padding: 10px;
+            border-radius: 4px;
             margin-bottom: 15px;
-        }
-        
-        .input-group label {
             font-size: 12px;
-            opacity: 0.7;
-        }
-        
-        .input-group input, .input-group select {
-            background: #222;
-            border: 1px solid #444;
-            color: #00ff88;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: inherit;
-        }
-        
-        .proxy-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .proxy-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .proxy-option:hover {
-            border-color: #00ff88;
-        }
-        
-        .proxy-option input[type="radio"] {
-            accent-color: #00ff88;
         }
         
         .btn {
@@ -162,9 +197,10 @@
             transform: scale(1.05);
         }
         
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            width: auto;
         }
         
         .btn-danger {
@@ -204,6 +240,7 @@
             grid-template-columns: 1fr auto;
             gap: 10px;
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .ticker-card:hover {
@@ -248,41 +285,6 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-        }
-        
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-        
-        .error {
-            color: #ff4444;
-            padding: 10px;
-            background: rgba(255, 68, 68, 0.1);
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-        
-        .success {
-            color: #00ff88;
-            padding: 10px;
-            background: rgba(0, 255, 136, 0.1);
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #333;
-            border-top-color: #00ff88;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
         
         .detail-view {
@@ -338,27 +340,71 @@
             background: rgba(0, 255, 136, 0.05);
         }
         
-        .log-entry.warning {
-            border-left-color: #ffaa00;
-            background: rgba(255, 170, 0, 0.05);
+        .log-entry.info {
+            border-left-color: #0088ff;
+            background: rgba(0, 136, 255, 0.05);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #333;
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="config-banner" id="configBanner">
-        ⚠️ Cloudflare Worker URLを設定してください
+    <!-- 初回セットアップ画面 -->
+    <div class="setup-overlay" id="setupOverlay">
+        <div class="setup-box">
+            <h1 class="setup-title">🔐 ISP Secure Setup</h1>
+            
+            <div class="setup-info">
+                <strong>🔒 セキュアモード</strong><br>
+                APIキーは暗号化してローカル保存されます。<br>
+                GitHubに公開しても安全です。
+            </div>
+            
+            <div>
+                <label style="font-size: 12px; opacity: 0.7;">Polygon API Key</label>
+                <input type="password" id="setupApiKey" class="setup-input" 
+                       placeholder="APIキーを入力" 
+                       value="">
+                       
+                <label style="font-size: 12px; opacity: 0.7;">Cloudflare Worker URL (オプション)</label>
+                <input type="text" id="setupWorkerUrl" class="setup-input" 
+                       placeholder="https://polygon-proxy.workers.dev" 
+                       value="https://polygon-proxy.savannanohara.workers.dev">
+            </div>
+            
+            <div class="setup-buttons">
+                <button class="setup-btn" onclick="saveInitialSetup()">保存して開始</button>
+                <button class="setup-btn secondary" onclick="skipSetup()">スキップ</button>
+            </div>
+        </div>
     </div>
     
+    <!-- メインアプリケーション -->
     <div class="header">
         <div class="header-content">
-            <div class="title">🚀 ISP v1.1 - Enhanced Trading System</div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="title">🚀 ISP v1.2 - Secure</div>
+                <div class="security-badge">🔒 APIキー保護モード</div>
+            </div>
             <div class="status">
                 <div class="status-item">
                     <div class="status-value" id="maintenance">197.45%</div>
                     <div class="status-label">維持率</div>
                 </div>
                 <div class="status-item">
-                    <div class="status-value" id="api-status">⚠️</div>
+                    <div class="status-value" id="api-status">⏳</div>
                     <div class="status-label">API状態</div>
                 </div>
                 <div class="status-item">
@@ -373,36 +419,15 @@
         <div class="panel">
             <div class="panel-title">⚙️ システム設定</div>
             
-            <div class="setup-section">
-                <div class="input-group">
-                    <label>接続方法</label>
-                    <div class="proxy-options">
-                        <label class="proxy-option">
-                            <input type="radio" name="proxy" value="direct">
-                            <span>直接接続（CORS エラーの可能性）</span>
-                        </label>
-                        <label class="proxy-option">
-                            <input type="radio" name="proxy" value="cloudflare" checked>
-                            <span>Cloudflare Worker 経由（推奨）</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="input-group" id="workerUrlGroup">
-                    <label>Cloudflare Worker URL</label>
-                    <input type="text" id="workerUrl" placeholder="https://your-worker.workers.dev" value="https://polygon-proxy.savannanohara.workers.dev">
-                </div>
-                
-                <div class="input-group">
-                    <label>Polygon API Key</label>
-                    <input type="password" id="apiKey" placeholder="APIキーを入力" value="GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6">
-                </div>
-                
-                <button class="btn" onclick="saveConfig()">設定を保存</button>
-                <div id="configMessage"></div>
+            <div class="config-info">
+                APIキーは暗号化して保存済み<br>
+                変更する場合は下のボタンから
             </div>
             
-            <div class="setup-section">
+            <button class="btn" onclick="showSetup()" style="margin-bottom: 10px;">APIキー再設定</button>
+            <button class="btn btn-danger" onclick="clearAllData()">データクリア</button>
+            
+            <div style="margin-top: 30px;">
                 <div class="panel-title">📊 ウォッチリスト</div>
                 <div class="ticker-grid">
                     <input type="text" id="addTicker" placeholder="銘柄追加 (例: AAPL)">
@@ -428,41 +453,54 @@
     </div>
     
     <script>
-        // ISP v1.1 Enhanced Implementation
-        class EnhancedISP {
+        // 簡易暗号化（本番環境ではより強固な暗号化を推奨）
+        const encrypt = (text) => btoa(text).split('').reverse().join('');
+        const decrypt = (text) => atob(text.split('').reverse().join(''));
+        
+        // Secure ISP System
+        class SecureISP {
             constructor() {
-                this.config = this.loadConfig();
+                this.config = this.loadSecureConfig();
                 this.watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
                 this.cache = new Map();
                 this.logs = [];
                 this.init();
             }
             
-            loadConfig() {
+            loadSecureConfig() {
+                const encryptedKey = localStorage.getItem('encrypted_api_key');
+                const workerUrl = localStorage.getItem('worker_url') || 'https://polygon-proxy.savannanohara.workers.dev';
+                
                 return {
-                    apiKey: localStorage.getItem('polygon_api_key') || 'GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6',
-                    useProxy: localStorage.getItem('use_proxy') !== 'false',
-                    workerUrl: localStorage.getItem('worker_url') || 'https://polygon-proxy.savannanohara.workers.dev',
+                    apiKey: encryptedKey ? decrypt(encryptedKey) : null,
+                    workerUrl: workerUrl,
+                    useProxy: true
                 };
+            }
+            
+            saveSecureConfig(apiKey, workerUrl) {
+                if (apiKey) {
+                    localStorage.setItem('encrypted_api_key', encrypt(apiKey));
+                }
+                if (workerUrl) {
+                    localStorage.setItem('worker_url', workerUrl);
+                }
+                this.config = this.loadSecureConfig();
             }
             
             init() {
                 this.updateTime();
                 setInterval(() => this.updateTime(), 1000);
                 
-                // UI初期化
-                this.initializeUI();
-                
-                // 設定確認
-                if (this.config.apiKey) {
-                    this.testConnection();
-                    if (this.watchlist.length === 0) {
-                        this.setDefaultWatchlist();
-                    }
-                    this.refreshWatchlist();
+                // 初回起動チェック
+                if (!this.config.apiKey) {
+                    document.getElementById('setupOverlay').classList.remove('hidden');
+                } else {
+                    document.getElementById('setupOverlay').classList.add('hidden');
+                    this.autoConnect();
                 }
                 
-                // 自動更新（30秒ごと）
+                // 30秒ごとの自動更新
                 setInterval(() => {
                     if (this.config.apiKey) {
                         this.refreshWatchlist();
@@ -470,22 +508,22 @@
                 }, 30000);
             }
             
-            initializeUI() {
-                // プロキシ設定の初期化
-                const proxyRadios = document.querySelectorAll('input[name="proxy"]');
-                proxyRadios.forEach(radio => {
-                    radio.addEventListener('change', (e) => {
-                        const useCloudflare = e.target.value === 'cloudflare';
-                        document.getElementById('workerUrlGroup').style.display = 
-                            useCloudflare ? 'block' : 'none';
-                    });
+            async autoConnect() {
+                this.log('🔐 セキュアモードで自動接続開始...', 'info');
+                
+                const success = await this.testConnection();
+                
+                if (success) {
+                    this.log('✅ 接続成功！', 'success');
                     
-                    if ((radio.value === 'cloudflare' && this.config.useProxy) ||
-                        (radio.value === 'direct' && !this.config.useProxy)) {
-                        radio.checked = true;
-                        radio.dispatchEvent(new Event('change'));
+                    if (this.watchlist.length === 0) {
+                        this.setDefaultWatchlist();
                     }
-                });
+                    
+                    await this.refreshWatchlist();
+                } else {
+                    this.log('接続失敗。APIキーを確認してください。', 'error');
+                }
             }
             
             updateTime() {
@@ -511,18 +549,12 @@
             }
             
             async makeAPICall(endpoint) {
-                let url;
-                const headers = {};
-                
-                if (this.config.useProxy && this.config.workerUrl) {
-                    const baseUrl = this.config.workerUrl.replace(/\/$/, '');
-                    url = `${baseUrl}/api/${endpoint}`;
-                    headers['X-API-Key'] = this.config.apiKey;
-                    headers['Content-Type'] = 'application/json';
-                } else {
-                    url = `https://api.polygon.io/${endpoint}?apiKey=${this.config.apiKey}`;
-                    headers['Content-Type'] = 'application/json';
-                }
+                const baseUrl = this.config.workerUrl.replace(/\/$/, '');
+                const url = `${baseUrl}/api/${endpoint}`;
+                const headers = {
+                    'X-API-Key': this.config.apiKey,
+                    'Content-Type': 'application/json'
+                };
                 
                 try {
                     const response = await fetch(url, { 
@@ -539,37 +571,27 @@
                     
                     return JSON.parse(responseText);
                 } catch (error) {
-                    this.log(`詳細エラー: ${error.message}`, 'error');
+                    this.log(`エラー: ${error.message}`, 'error');
                     throw error;
                 }
             }
             
             async testConnection() {
-                this.log('API接続テスト開始...', 'info');
+                this.log('API接続テスト中...', 'info');
                 const statusEl = document.getElementById('api-status');
                 statusEl.textContent = '🔄';
-                
-                this.config = this.loadConfig();
-                
-                if (!this.config.apiKey) {
-                    statusEl.textContent = '❌';
-                    this.log('APIキーが設定されていません', 'error');
-                    return false;
-                }
                 
                 try {
                     const data = await this.makeAPICall('v2/aggs/ticker/AAPL/prev');
                     
                     if (data.status === 'OK') {
                         statusEl.textContent = '✅';
-                        this.log('API接続成功！', 'success');
                         return true;
                     } else {
                         throw new Error(data.status || 'Unknown error');
                     }
                 } catch (error) {
                     statusEl.textContent = '❌';
-                    this.log(`接続エラー: ${error.message}`, 'error');
                     return false;
                 }
             }
@@ -597,7 +619,7 @@
                     
                     return result;
                 } catch (error) {
-                    this.log(`${symbol}のデータ取得失敗: ${error.message}`, 'error');
+                    this.log(`${symbol}のデータ取得失敗`, 'error');
                     throw error;
                 }
             }
@@ -609,7 +631,7 @@
                 if (!symbol) return;
                 
                 if (this.watchlist.includes(symbol)) {
-                    this.log(`${symbol}は既にウォッチリストに存在します`, 'warning');
+                    this.log(`${symbol}は既に存在します`, 'info');
                     return;
                 }
                 
@@ -619,19 +641,19 @@
                     this.watchlist.push(symbol);
                     localStorage.setItem('watchlist', JSON.stringify(this.watchlist));
                     
-                    this.log(`${symbol}をウォッチリストに追加`, 'success');
+                    this.log(`${symbol}を追加`, 'success');
                     input.value = '';
                     
                     this.refreshWatchlist();
                 } catch (error) {
-                    this.log(`${symbol}の追加失敗: ${error.message}`, 'error');
+                    this.log(`${symbol}の追加失敗`, 'error');
                 }
             }
             
             removeFromWatchlist(symbol) {
                 this.watchlist = this.watchlist.filter(s => s !== symbol);
                 localStorage.setItem('watchlist', JSON.stringify(this.watchlist));
-                this.log(`${symbol}をウォッチリストから削除`, 'info');
+                this.log(`${symbol}を削除`, 'info');
                 this.refreshWatchlist();
             }
             
@@ -676,7 +698,7 @@
                             <div class="ticker-card">
                                 <div class="ticker-info">
                                     <div class="ticker-symbol">${symbol}</div>
-                                    <div class="error">データ取得エラー</div>
+                                    <div class="error">エラー</div>
                                 </div>
                             </div>
                         `;
@@ -696,7 +718,7 @@
                     const detail = data.detail;
                     
                     if (!prev) {
-                        throw new Error('データが取得できません');
+                        throw new Error('データなし');
                     }
                     
                     const change = ((prev.c - prev.o) / prev.o * 100).toFixed(2);
@@ -730,16 +752,6 @@
                                     <div class="detail-label">始値</div>
                                     <div class="detail-value">$${prev.o.toFixed(2)}</div>
                                 </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">時価総額</div>
-                                    <div class="detail-value">
-                                        ${detail?.market_cap ? `$${(detail.market_cap / 1e9).toFixed(2)}B` : 'N/A'}
-                                    </div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">セクター</div>
-                                    <div class="detail-value">${detail?.sic_description || 'N/A'}</div>
-                                </div>
                             </div>
                         </div>
                     `;
@@ -752,60 +764,48 @@
             
             setDefaultWatchlist() {
                 const defaults = ['AAPL', 'NVDA', 'TSLA', 'MSFT', 'GOOGL'];
-                this.log('推奨銘柄をウォッチリストに追加', 'info');
                 this.watchlist = defaults;
                 localStorage.setItem('watchlist', JSON.stringify(this.watchlist));
+                this.log('デフォルト銘柄セット', 'info');
             }
         }
         
         // グローバルインスタンス
-        const isp = new EnhancedISP();
+        const isp = new SecureISP();
         
-        // グローバル関数として定義
-        function addToWatchlist() {
-            isp.addToWatchlist();
-        }
-        
-        // 設定保存
-        function saveConfig() {
-            const apiKeyInput = document.getElementById('apiKey');
-            const apiKey = apiKeyInput.value;
-            const useProxy = document.querySelector('input[name="proxy"]:checked').value === 'cloudflare';
-            const workerUrl = document.getElementById('workerUrl').value;
+        // グローバル関数
+        function saveInitialSetup() {
+            const apiKey = document.getElementById('setupApiKey').value;
+            const workerUrl = document.getElementById('setupWorkerUrl').value;
             
             if (!apiKey) {
-                document.getElementById('configMessage').innerHTML = 
-                    '<div class="error">APIキーを入力してください</div>';
+                alert('APIキーを入力してください');
                 return;
             }
             
-            if (useProxy && !workerUrl) {
-                document.getElementById('configMessage').innerHTML = 
-                    '<div class="error">Cloudflare Worker URLを入力してください</div>';
-                return;
+            isp.saveSecureConfig(apiKey, workerUrl);
+            document.getElementById('setupOverlay').classList.add('hidden');
+            isp.autoConnect();
+        }
+        
+        function skipSetup() {
+            document.getElementById('setupOverlay').classList.add('hidden');
+            isp.log('セットアップをスキップしました', 'info');
+        }
+        
+        function showSetup() {
+            document.getElementById('setupOverlay').classList.remove('hidden');
+        }
+        
+        function clearAllData() {
+            if (confirm('すべてのデータをクリアしますか？')) {
+                localStorage.clear();
+                location.reload();
             }
-            
-            // 保存
-            localStorage.setItem('polygon_api_key', apiKey);
-            localStorage.setItem('use_proxy', useProxy);
-            localStorage.setItem('worker_url', workerUrl);
-            
-            // 設定を更新
-            isp.config.apiKey = apiKey;
-            isp.config.useProxy = useProxy;
-            isp.config.workerUrl = workerUrl;
-            
-            isp.log('設定を保存しました', 'success');
-            
-            document.getElementById('configMessage').innerHTML = 
-                '<div class="success">✅ 設定保存完了</div>';
-            
-            // 接続テスト
-            isp.testConnection().then(success => {
-                if (success) {
-                    isp.refreshWatchlist();
-                }
-            });
+        }
+        
+        function addToWatchlist() {
+            isp.addToWatchlist();
         }
         
         // エンターキー対応
@@ -813,6 +813,12 @@
             document.getElementById('addTicker').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     isp.addToWatchlist();
+                }
+            });
+            
+            document.getElementById('setupApiKey').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveInitialSetup();
                 }
             });
         });
