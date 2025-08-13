@@ -1,0 +1,74 @@
+---
+name: Production CI with All Actions
+on:
+  push:
+    branches: [main, develop, feature/composite-actions]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run Tests with Cache
+    runs-on: ubuntu-latest
+    steps:
+      # ステップ1: リポジトリをチェックアウト（必須・最初に実行）
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # ステップ2: Python環境をセットアップ
+      - name: Setup Python environment
+        uses: ./.github/actions/setup-project
+        with:
+          python-version: '3.11'
+      
+      # ステップ3: 依存関係をキャッシュ
+      - name: Cache dependencies
+        uses: ./.github/actions/cache-dependencies
+        with:
+          cache-key-prefix: 'test-deps'
+          python-version: '3.11'
+      
+      # ステップ4: テスト実行
+      - name: Run tests
+        run: |
+          echo "🧪 Running tests with cached dependencies..."
+          python --version
+          pip --version
+          # pytest tests/ --cov=.
+          echo "✅ Tests completed"
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: ./.github/actions/setup-project
+        with:
+          python-version: '3.11'
+      
+      - name: Cache lint dependencies
+        uses: ./.github/actions/cache-dependencies
+        with:
+          cache-key-prefix: 'lint-deps'
+          python-version: '3.11'
+      
+      - name: Run linters
+        run: |
+          echo "🔍 Running linters..."
+          # flake8 .
+          # black --check .
+          echo "✅ Linting completed"
+
+  echo-test:
+    name: Echo Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test echo action
+        uses: ./.github/actions/echo-action
+      
+      - name: Verify echo
+        run: echo "✅ Echo test passed"

@@ -1,0 +1,38 @@
+name: Performance Benchmark
+
+on:
+  schedule:
+    - cron: "0 2 * * SUN"  # 毎週日曜日2時
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Benchmark Workflow Times
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## ⚡ Performance Report" >> $GITHUB_STEP_SUMMARY
+          echo "Date: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Get average runtime for last 10 runs
+          gh api /repos/${{ github.repository }}/actions/runs \
+            --jq ".workflow_runs[:10]" | \
+          jq -r "
+            . | group_by(.name) |
+            map({
+              name: .[0].name,
+              avg_minutes: (map(.run_duration_ms) | add / length / 60000)
+            }) |
+            .[] |
+            \"- \\(.name): \\(.avg_minutes | floor) min avg\"
+          " >> $GITHUB_STEP_SUMMARY || true
+
+      - name: Cache Hit Rate
+        run: |
+          echo "## 📦 Cache Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "Analyzing cache effectiveness..." >> $GITHUB_STEP_SUMMARY

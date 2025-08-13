@@ -1,0 +1,8 @@
+name: 'Echo Action'
+description: 'Simple test action'
+runs:
+  using: 'composite'
+  steps:
+    - name: Echo
+      shell: bash
+      run: echo "✅ Echo action works!"

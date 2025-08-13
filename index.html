@@ -419,3 +419,878 @@
     </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISP Trading System v1.2 - Secure Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* セットアップ画面 */
+        .setup-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .setup-screen h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .setup-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .setup-info {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .setup-info p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .setup-info code {
+            background: #e3e7f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #5a67d8;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* メイン画面 */
+        .main-screen {
+            display: none;
+        }
+
+        .status-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ticker-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticker-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .ticker-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .ticker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .ticker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .ticker-symbol {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ticker-price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .ticker-change {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .ticker-change.positive {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .ticker-change.negative {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .ticker-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .ticker-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .update-time {
+            color: #888;
+            font-size: 0.85em;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .settings-btn {
+            background: #6b7280;
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .settings-btn:hover {
+            background: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .ticker-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- セットアップ画面 -->
+        <div id="setupScreen" class="setup-screen">
+            <h1>ISP Trading System v1.2</h1>
+            <h2>初期セットアップ</h2>
+            
+            <div class="setup-form">
+                <div class="setup-info">
+                    <p><strong>🔐 セキュアモード</strong></p>
+                    <p>APIキーは暗号化されてブラウザに保存されます。</p>
+                    <p>GitHubパブリックリポジトリでも安全に使用できます。</p>
+                    <p style="margin-top: 10px;">
+                        <strong>Polygon API Key:</strong> 
+                        <code>GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6</code>
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="apiKeyInput">Polygon.io API キー</label>
+                    <input type="password" id="apiKeyInput" placeholder="APIキーを入力してください" value="GW2Dm91_PtRLfU_NpHQ3LKG8gASIT5b6">
+                </div>
+
+                <div class="form-group">
+                    <label for="workerUrlInput">Cloudflare Worker URL (オプション)</label>
+                    <input type="text" id="workerUrlInput" placeholder="https://your-worker.workers.dev" value="https://polygon-proxy.savannanohara.workers.dev">
+                </div>
+
+                <button class="btn-primary" onclick="saveSetup()">システムを起動</button>
+            </div>
+        </div>
+
+        <!-- メイン画面 -->
+        <div id="mainScreen" class="main-screen">
+            <h1>ISP Trading System</h1>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-indicator"></span>
+                    <span id="connectionStatus">接続中...</span>
+                </div>
+                <div class="status-item">
+                    <span id="lastUpdate">最終更新: --:--:--</span>
+                </div>
+                <div class="status-item">
+                    <button class="settings-btn" onclick="resetSetup()">設定リセット</button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <input type="text" id="tickerInput" placeholder="ティッカーシンボル (例: AAPL)" onkeypress="handleKeyPress(event)">
+                    <button onclick="addTicker()">銘柄追加</button>
+                </div>
+                <div class="control-group">
+                    <button id="refreshBtn" onclick="refreshAll()">全更新</button>
+                    <button id="autoRefreshBtn" onclick="toggleAutoRefresh()">自動更新: OFF</button>
+                </div>
+            </div>
+
+            <div id="tickerGrid" class="ticker-grid"></div>
+            <div id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // 暗号化ユーティリティ
+        const CryptoUtil = {
+            encrypt: async (text) => {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+                const key = await crypto.subtle.generateKey(
+                    { name: 'AES-GCM', length: 256 },
+                    true,
+                    ['encrypt', 'decrypt']
+                );
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encrypted = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv },
+                    key,
+                    data
+                );
+                const exportedKey = await crypto.subtle.exportKey('raw', key);
+                return {
+                    encrypted: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+                    key: btoa(String.fromCharCode(...new Uint8Array(exportedKey))),
+                    iv: btoa(String.fromCharCode(...iv))
+                };
+            },
+            
+            decrypt: async (encryptedData) => {
+                const key = await crypto.subtle.importKey(
+                    'raw',
+                    Uint8Array.from(atob(encryptedData.key), c => c.charCodeAt(0)),
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['decrypt']
+                );
+                const decrypted = await crypto.subtle.decrypt(
+                    { 
+                        name: 'AES-GCM', 
+                        iv: Uint8Array.from(atob(encryptedData.iv), c => c.charCodeAt(0))
+                    },
+                    key,
+                    Uint8Array.from(atob(encryptedData.encrypted), c => c.charCodeAt(0))
+                );
+                return new TextDecoder().decode(decrypted);
+            }
+        };
+
+        // グローバル変数
+        let tickers = ['AAPL', 'NVDA', 'TSLA', 'MSFT', 'GOOGL'];
+        let autoRefreshInterval = null;
+        let apiConfig = null;
+
+        // セットアップ関数
+        async function saveSetup() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const workerUrl = document.getElementById('workerUrlInput').value.trim();
+            
+            if (!apiKey) {
+                alert('APIキーを入力してください');
+                return;
+            }
+
+            try {
+                // APIキーを暗号化
+                const encryptedApiKey = await CryptoUtil.encrypt(apiKey);
+                
+                // 設定を保存
+                const config = {
+                    apiKey: encryptedApiKey,
+                    workerUrl: workerUrl || null,
+                    setupDate: new Date().toISOString()
+                };
+                
+                localStorage.setItem('ispTradingConfig', JSON.stringify(config));
+                
+                // メイン画面を表示
+                document.getElementById('setupScreen').style.display = 'none';
+                document.getElementById('mainScreen').style.display = 'block';
+                
+                // システム初期化
+                await initializeSystem();
+            } catch (error) {
+                console.error('Setup error:', error);
+                alert('セットアップエラー: ' + error.message);
+            }
+        }
+
+        // システム初期化
+        async function initializeSystem() {
+            try {
+                // 設定を読み込み
+                const configStr = localStorage.getItem('ispTradingConfig');
+                if (!configStr) {
+                    showSetupScreen();
+                    return;
+                }
+                
+                const config = JSON.parse(configStr);
+                const apiKey = await CryptoUtil.decrypt(config.apiKey);
+                
+                apiConfig = {
+                    apiKey: apiKey,
+                    workerUrl: config.workerUrl
+                };
+                
+                // 保存された銘柄を読み込み
+                const savedTickers = localStorage.getItem('ispTickers');
+                if (savedTickers) {
+                    tickers = JSON.parse(savedTickers);
+                }
+                
+                // 初期データ取得
+                await refreshAll();
+                
+                // 接続ステータス更新
+                updateConnectionStatus('接続完了', true);
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showSetupScreen();
+            }
+        }
+
+        // セットアップ画面を表示
+        function showSetupScreen() {
+            document.getElementById('setupScreen').style.display = 'block';
+            document.getElementById('mainScreen').style.display = 'none';
+        }
+
+        // 設定リセット
+        function resetSetup() {
+            if (confirm('設定をリセットしますか？')) {
+                localStorage.removeItem('ispTradingConfig');
+                localStorage.removeItem('ispTickers');
+                location.reload();
+            }
+        }
+
+        // APIリクエスト関数
+        async function fetchTickerData(symbol) {
+            if (!apiConfig) {
+                throw new Error('API設定が見つかりません');
+            }
+
+            // Cloudflare Worker経由でリクエスト（APIキーはWorker側で追加）
+            const baseUrl = apiConfig.workerUrl || 'https://api.polygon.io';
+            const endpoint = `${baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true`;
+
+            try {
+                const response = await fetch(endpoint);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                if (data.status === 'OK' && data.results && data.results.length > 0) {
+                    return data.results[0];
+                } else {
+                    throw new Error('データが見つかりません');
+                }
+            } catch (error) {
+                console.error(`Error fetching ${symbol}:`, error);
+                throw error;
+            }
+        }
+
+        // ティッカー追加
+        async function addTicker() {
+            const input = document.getElementById('tickerInput');
+            const symbol = input.value.trim().toUpperCase();
+            
+            if (!symbol) {
+                alert('ティッカーシンボルを入力してください');
+                return;
+            }
+            
+            if (tickers.includes(symbol)) {
+                alert('この銘柄は既に追加されています');
+                return;
+            }
+            
+            try {
+                await createTickerCard(symbol);
+                tickers.push(symbol);
+                saveTickers();
+                input.value = '';
+            } catch (error) {
+                alert(`銘柄の追加に失敗しました: ${error.message}`);
+            }
+        }
+
+        // ティッカーカード作成
+        async function createTickerCard(symbol) {
+            const grid = document.getElementById('tickerGrid');
+            
+            // 既存のカードがあれば削除
+            const existingCard = document.getElementById(`ticker-${symbol}`);
+            if (existingCard) {
+                existingCard.remove();
+            }
+            
+            // カード作成
+            const card = document.createElement('div');
+            card.className = 'ticker-card';
+            card.id = `ticker-${symbol}`;
+            card.innerHTML = `
+                <div class="ticker-header">
+                    <span class="ticker-symbol">${symbol}</span>
+                    <div class="loading"></div>
+                </div>
+                <div class="ticker-content">
+                    <div>データ取得中...</div>
+                </div>
+            `;
+            
+            grid.appendChild(card);
+            
+            // データ取得と表示
+            try {
+                const data = await fetchTickerData(symbol);
+                updateTickerCard(symbol, data);
+            } catch (error) {
+                card.innerHTML = `
+                    <div class="ticker-header">
+                        <span class="ticker-symbol">${symbol}</span>
+                    </div>
+                    <div class="ticker-content">
+                        <div style="color: #dc2626;">エラー: ${error.message}</div>
+                    </div>
+                    <div class="ticker-footer">
+                        <button class="remove-btn" onclick="removeTicker('${symbol}')">削除</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ティッカーカード更新
+        function updateTickerCard(symbol, data) {
+            const card = document.getElementById(`ticker-${symbol}`);
+            if (!card) return;
+            
+            const change = ((data.c - data.o) / data.o * 100).toFixed(2);
+            const changeClass = change >= 0 ? 'positive' : 'negative';
+            const changeSymbol = change >= 0 ? '+' : '';
+            
+            card.innerHTML = `
+                <div class="ticker-header">
+                    <span class="ticker-symbol">${symbol}</span>
+                </div>
+                <div class="ticker-content">
+                    <div class="ticker-price">$${data.c.toFixed(2)}</div>
+                    <span class="ticker-change ${changeClass}">${changeSymbol}${change}%</span>
+                    
+                    <div class="ticker-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">始値</span>
+                            <span class="stat-value">$${data.o.toFixed(2)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">高値</span>
+                            <span class="stat-value">$${data.h.toFixed(2)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">安値</span>
+                            <span class="stat-value">$${data.l.toFixed(2)}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">出来高</span>
+                            <span class="stat-value">${(data.v / 1000000).toFixed(2)}M</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ticker-footer">
+                    <span class="update-time">${new Date().toLocaleTimeString('ja-JP')}</span>
+                    <button class="remove-btn" onclick="removeTicker('${symbol}')">削除</button>
+                </div>
+            `;
+        }
+
+        // ティッカー削除
+        function removeTicker(symbol) {
+            const card = document.getElementById(`ticker-${symbol}`);
+            if (card) {
+                card.remove();
+            }
+            tickers = tickers.filter(t => t !== symbol);
+            saveTickers();
+        }
+
+        // 全銘柄更新
+        async function refreshAll() {
+            const btn = document.getElementById('refreshBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '更新中...';
+            }
+            
+            for (const symbol of tickers) {
+                await createTickerCard(symbol);
+            }
+            
+            updateLastUpdateTime();
+            
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '全更新';
+            }
+        }
+
+        // 自動更新トグル
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('autoRefreshBtn');
+            
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                btn.textContent = '自動更新: OFF';
+            } else {
+                autoRefreshInterval = setInterval(refreshAll, 30000); // 30秒ごと
+                btn.textContent = '自動更新: ON';
+                refreshAll(); // 即座に更新
+            }
+        }
+
+        // 接続ステータス更新
+        function updateConnectionStatus(message, isConnected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                const indicator = statusElement.previousElementSibling;
+                if (indicator) {
+                    indicator.style.background = isConnected ? '#4ade80' : '#ef4444';
+                }
+            }
+        }
+
+        // 最終更新時刻更新
+        function updateLastUpdateTime() {
+            const element = document.getElementById('lastUpdate');
+            if (element) {
+                element.textContent = `最終更新: ${new Date().toLocaleTimeString('ja-JP')}`;
+            }
+        }
+
+        // ティッカーリスト保存
+        function saveTickers() {
+            localStorage.setItem('ispTickers', JSON.stringify(tickers));
+        }
+
+        // キーボードイベント処理
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTicker();
+            }
+        }
+
+        // エラーメッセージ表示
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            if (errorDiv) {
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                setTimeout(() => {
+                    errorDiv.textContent = '';
+                    errorDiv.className = '';
+                }, 5000);
+            }
+        }
+
+        // 初期化
+        window.addEventListener('DOMContentLoaded', async () => {
+            // 既存の設定があるか確認
+            const config = localStorage.getItem('ispTradingConfig');
+            if (config) {
+                document.getElementById('setupScreen').style.display = 'none';
+                document.getElementById('mainScreen').style.display = 'block';
+                await initializeSystem();
+            } else {
+                showSetupScreen();
+            }
+        });
+
+        // ページ離脱時の処理
+        window.addEventListener('beforeunload', () => {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

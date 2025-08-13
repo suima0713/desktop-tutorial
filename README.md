@@ -1,11 +1,12 @@
-# 🚀 TradingSystem2025 - 完全自動化トレーディングアラートシステム
+# 🚀 TradingSystem2025 - AI-Human Fusion Trading Platform
 
 ## 📋 概要
 
-TradingSystem2025は、Brave Search APIとn8nを統合した完全自動化トレーディングアラートシステムです。日経平均やマージンコール関連の情報を自動検索し、リアルタイムでアラートを生成します。
+TradingSystem2025は、AIと人間の融合による次世代トレーディングシステムです。SystemVoice機能により、システムに「声」を与え、リアルタイムでの対話的なコミュニケーションを実現します。
 
 ## ✨ 主な機能
 
+- 🤖 **SystemVoice機能**: システムに「声」を与える対話機能
 - 🔍 **自動検索**: 5分間隔で日経平均関連情報を自動検索
 - 🚨 **リアルタイムアラート**: 重要な情報を即座に通知
 - 🔄 **n8n統合**: ワークフロー自動化による高度な処理
@@ -16,18 +17,35 @@ TradingSystem2025は、Brave Search APIとn8nを統合した完全自動化ト�
 
 ```
 TradingSystem2025/
-├── mcp_server.js              # HTTPサーバー（ポート3001）
-├── create_n8n_workflow.js     # n8nワークフロー自動作成
-├── test_all_systems.js        # システム統合テスト
-├── start_system.ps1           # 完全自動起動スクリプト
-├── package.json               # 依存関係管理
-├── .env                       # 環境変数設定
-└── n8n_workflow.json         # n8nワークフロー設定
+├── index.html                 # Webインターフェース
+├── system_voice.js           # SystemVoiceコアモジュール
+├── integrate_system_voice.js # 統合スクリプト
+├── test_system_voice.js      # テストスクリプト
+├── mcp_server.js             # HTTPサーバー（ポート3001）
+├── create_n8n_workflow.js    # n8nワークフロー自動作成
+├── test_all_systems.js       # システム統合テスト
+├── start_system.ps1          # 完全自動起動スクリプト
+├── package.json              # 依存関係管理
+├── .env                      # 環境変数設定
+└── n8n_workflow.json        # n8nワークフロー設定
 ```
 
 ## 🚀 クイックスタート
 
-### 1. 環境準備
+### 1. SystemVoice機能のテスト
+
+```bash
+# Webインターフェースでテスト
+start index.html
+
+# Node.jsでテスト
+node test_system_voice.js
+
+# バッチファイルでテスト
+test_system_voice.bat
+```
+
+### 2. 環境準備
 
 ```powershell
 # PowerShell 7.x で実行
@@ -35,7 +53,7 @@ cd TradingSystem2025
 .\start_system.ps1
 ```
 
-### 2. 手動セットアップ
+### 3. 手動セットアップ
 
 #### 依存関係インストール
 ```bash
@@ -87,6 +105,25 @@ GET http://localhost:3001/test
 ```
 
 ## 🔧 詳細設定
+
+### SystemVoice機能
+
+SystemVoice機能は、システムに「声」を与える機能です：
+
+```javascript
+const { SystemVoice } = require('./system_voice.js');
+
+// 基本的な使用
+SystemVoice.speak('システムが起動しました', 'success');
+SystemVoice.speak('API制限に近づいています', 'warning');
+SystemVoice.speak('接続エラーが発生しました', 'error');
+
+// ログレベル設定
+SystemVoice.setLogLevel('warning');
+
+// 統計情報取得
+const stats = SystemVoice.getStats();
+```
 
 ### n8nワークフロー設定
 
@@ -258,3 +295,51 @@ GitHub Issues で問題を報告してください
 - [ ] 環境変数が適切に設定
 
 **🎉 全てチェックが完了したら、システムは完全自動化モードで稼働しています！**
+=======
+# Desktop Tutorial
+
+[![CI Tests](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/ci-tests.yml)
+[![Static Analysis](https://github.com/suima0713/desktop-tutorial/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/static-analysis.yml)
+[![License Check](https://github.com/suima0713/desktop-tutorial/actions/workflows/license-check.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/license-check.yml)
+[![Security Audit](https://github.com/suima0713/desktop-tutorial/actions/workflows/security-audit.yml/badge.svg)](https://github.com/suima0713/desktop-tutorial/actions/workflows/security-audit.yml)
+
+## 🔒 Security Features
+
+### Phase 3 完了 ✅
+- Automated dependency updates (Dependabot)
+- Security vulnerability scanning (Trivy)
+- License compliance checks
+- SBOM generation with digital signatures
+- Branch protection policies
+
+### Phase 4 実装中 🚧
+- GitHub Actions usage monitoring
+- Performance optimization
+- Alert notifications
+
+## Quick Start
+
+```python
+# Install dependencies
+poetry install
+
+# Run tests
+poetry run pytest
+
+# Run security scan
+poetry run safety check
+License
+MIT
+
+# GitHub Composite Actions
+
+## ✅ 実装済みのComposite Actions
+
+### 📦 setup-project
+Python環境のセットアップを行うアクション
+
+```yaml
+- uses: ./.github/actions/setup-project
+  with:
+    python-version: '3.11'  # オプション、デフォルト: 3.11
+>>>>>>> c70c10d9d8934f1bbc8429bb5f7c96770eacc697

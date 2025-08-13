@@ -143,3 +143,43 @@ logs/
 *.log
 backup/
 temp/
+
+# Python build / test artifacts
+*.py[cod]
+__pycache__/
+.coverage
+coverage.xml
+htmlcov/
+.test_durations
+.pytest_cache/
+coverage.*
+*.pyo
+*.pyd
+coverage.svg
+*.coverage.*
+*$py.class
+
+# Environment / virtualenv
+.venv/
+.env.*
+env/
+venv/
+
+# Scratch project used in tutorials
+desktop-tutorial/
+.mypy_cache/
+.ruff_cache/
+.tox/
+*.egg-info/
+.smoke/
+
+# Tooling caches
+.cache/
+.ruff_cache/
+
+# Coverage / reports
+reports/
+
+# VS Code
+/.vscode/*
+!/.vscode/settings.json

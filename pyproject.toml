@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "desktop-tutorial"  # プロジェクト名を適切に設定
+version = "0.1.0"
+description = "A tutorial project for desktop application"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "desktop_tutorial"}]  # アンダースコア版
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+pytest-cov = "^4.1.0"
+pip-audit = "^2.9.0"
+ruff = "^0.12.7"
+bandit = "^1.8.6"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = [
+    "--cov=desktop_tutorial",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "-v"
+]

@@ -1,0 +1,41 @@
+---
+name: CI with Composite Actions
+on:
+  push:
+    branches: [feature/composite-actions]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # 必ず最初に実行
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          python --version
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # 必ず最初に実行
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
+      - name: Run linters
+        run: |
+          echo "Running linters..."
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # 必ず最初に実行
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
+        with:
+          python-version: '3.10'
+      - name: Build package
+        run: |
+          echo "Building package..."

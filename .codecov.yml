@@ -1,0 +1,26 @@
+# Codecov configuration
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1% # 全体カバレッジは1%の変動を許容
+        base: auto
+    patch:
+      default:
+        target: 80% # 新規コードは80%以上のカバレッジ必須
+        threshold: 5% # 5%の誤差を許容
+        base: auto
+        if_ci_failed: error # CIが失敗したらエラー
+
+comment:
+  layout: "header, diff, flags, components, tree"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "tests/**"
+  - "**/*_test.py"
+  - "**/test_*.py"
+  - "setup.py"
+  - "docs/**"

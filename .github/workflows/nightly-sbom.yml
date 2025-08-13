@@ -1,0 +1,111 @@
+name: Nightly SBOM Generation
+
+on:
+  schedule:
+    # 毎日 01:21 UTC (日本時間 10:21)
+    - cron: '21 1 * * *'
+  workflow_dispatch:  # 手動実行も可能
+  push:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'
+      - 'poetry.lock'
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write  # OIDC token for attestation
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    name: Generate SBOM
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install CycloneDX
+        run: |
+          pip install cyclonedx-bom
+          pip install poetry
+
+      - name: Install project dependencies
+        run: |
+          poetry install --no-interaction --no-ansi
+
+      - name: Generate SBOM in CycloneDX format
+        run: |
+          # Generate from Poetry
+          poetry run cyclonedx-py poetry -o sbom-cyclonedx.json --format json --poetry-lock-file poetry.lock
+          poetry run cyclonedx-py poetry -o sbom-cyclonedx.xml --format xml --poetry-lock-file poetry.lock
+
+          # Also generate SPDX format
+          pip install cyclonedx2spdx
+          cyclonedx2spdx --input sbom-cyclonedx.json --output sbom-spdx.json || true
+
+          # Create summary
+          echo "## 📦 SBOM Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Formats**: CycloneDX (JSON, XML), SPDX (JSON)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Package Count" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          jq '.components | length' sbom-cyclonedx.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ github.run_number }}
+          path: |
+            sbom-*.json
+            sbom-*.xml
+          retention-days: 90
+
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v1
+        with:
+          subject-path: '.'
+          sbom-path: 'sbom-cyclonedx.json'
+          push-to-registry: false
+        continue-on-error: true
+
+      - name: Create SBOM badge data
+        run: |
+          COMPONENT_COUNT=$(jq '.components | length' sbom-cyclonedx.json)
+          TIMESTAMP=$(date -u +"%Y-%m-%d")
+
+          # Create badge JSON
+          echo "{
+            \"schemaVersion\": 1,
+            \"label\": \"SBOM\",
+            \"message\": \"${COMPONENT_COUNT} components | ${TIMESTAMP}\",
+            \"color\": \"blue\"
+          }" > sbom-badge.json
+
+          # Also create a detailed report
+          echo "# SBOM Report" > sbom-report.md
+          echo "" >> sbom-report.md
+          echo "**Generated**: ${TIMESTAMP}" >> sbom-report.md
+          echo "**Total Components**: ${COMPONENT_COUNT}" >> sbom-report.md
+          echo "" >> sbom-report.md
+          echo "## Top-level Dependencies" >> sbom-report.md
+          poetry show --tree --no-dev | head -20 >> sbom-report.md
+
+      - name: Upload badge and report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-badge-${{ github.run_number }}
+          path: |
+            sbom-badge.json
+            sbom-report.md
+          retention-days: 30

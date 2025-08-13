@@ -1,0 +1,65 @@
+---
+name: update-badges
+
+on:
+  workflow_run:
+    workflows: ["ci-tests", "security-audit"] # 必要なworkflow名をすべて記載
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  update-badges:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # coverage バッジ更新
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-xml-3.10-stable
+
+      - name: Parse coverage
+        id: cov
+        run: |
+          pct=$(python - <<'PY'
+          import xml.etree.ElementTree as ET
+          p=float(ET.parse('coverage.xml').getroot().attrib['line-rate'])*100
+          print(f"{p:.1f}")
+          PY
+          )
+          echo "pct=$pct" >> $GITHUB_OUTPUT
+
+      - name: Patch README (coverage)
+        run: |
+          NEW="https://img.shields.io/badge/coverage-${{ steps.cov.outputs.pct }}%25-brightgreen"
+          sed -i -E "s#https://img.shields.io/badge/coverage-[^ )]+#$NEW#g" README.md
+
+      # security バッジ更新 (artifactから取得する例)
+      - uses: actions/download-artifact@v4
+        with:
+          name: audit-json
+
+      - name: Parse security audit
+        id: sec
+        run: |
+          level=$(python -c "import json; print(json.load(open('audit.json')).get('level', 'unknown'))")
+          color=$(python -c "import json; print(json.load(open('audit.json')).get('color', 'lightgrey'))")
+          echo "level=$level" >> $GITHUB_OUTPUT
+          echo "color=$color" >> $GITHUB_OUTPUT
+
+      - name: Patch README (security)
+        run: |
+          SEC="https://img.shields.io/badge/security-${{ steps.sec.outputs.level }}-${{ steps.sec.outputs.color }}"
+          sed -i -E "s#https://img.shields.io/badge/security-[^ )]+#$SEC#g" README.md
+
+      - name: Commit & Push
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "github-actions@github.com"
+          git add README.md
+          git diff --cached --quiet && echo "No change" || \
+          git commit -m "docs: update badges [skip ci]"
+          git push
