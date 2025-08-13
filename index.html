@@ -417,6 +417,52 @@
             SystemVoice.speak('システムを終了します', 'info');
         });
     </script>
+    <!-- Google tag (gtag.js) --> 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PC6HDPH0R4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PC6HDPH0R4');
+    </script>
+
+    <!-- Google Analytics カスタムトラッキング -->
+    <script>
+    // AnalyticsTracker
+    const AnalyticsTracker = {
+        trackEvent: function(category, action, label = null, value = null) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    'event_category': category,
+                    'event_label': label,
+                    'value': value
+                });
+                console.log(`[GA] Tracked: ${category} - ${action}`);
+            }
+        },
+        trackAPICall: function(symbol, success, responseTime) {
+            this.trackEvent('API', success ? 'success' : 'error', symbol, responseTime);
+        },
+        trackError: function(errorType, errorMessage) {
+            this.trackEvent('Error', errorType, errorMessage);
+        },
+        trackUserAction: function(action, details) {
+            this.trackEvent('User', action, details);
+        }
+    };
+
+    // SystemVoiceとの統合
+    const originalSpeak = SystemVoice.speak;
+    SystemVoice.speak = function(message, level = 'info') {
+        originalSpeak.call(this, message, level);
+        if (level === 'error') {
+            AnalyticsTracker.trackError('system_message', message);
+        }
+    };
+
+    // ページロード時のトラッキング
+    AnalyticsTracker.trackEvent('Session', 'start', new Date().toISOString());
+    </script>
 </body>
 </html>
 =======
